@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.TsukasaChan.ShopVault.mapper.order.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.order.Order">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="order_no" column="order_no" jdbcType="VARCHAR"/>
+            <result property="user_id" column="user_id" jdbcType="BIGINT"/>
+            <result property="total_amount" column="total_amount" jdbcType="DECIMAL"/>
+            <result property="pay_amount" column="pay_amount" jdbcType="DECIMAL"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="receiver_snapshot" column="receiver_snapshot" jdbcType="VARCHAR"/>
+            <result property="tracking_company" column="tracking_company" jdbcType="VARCHAR"/>
+            <result property="tracking_no" column="tracking_no" jdbcType="VARCHAR"/>
+            <result property="payment_time" column="payment_time" jdbcType="TIMESTAMP"/>
+            <result property="delivery_time" column="delivery_time" jdbcType="TIMESTAMP"/>
+            <result property="receive_time" column="receive_time" jdbcType="TIMESTAMP"/>
+            <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_no,user_id,total_amount,pay_amount,status,
+        receiver_snapshot,tracking_company,tracking_no,payment_time,delivery_time,
+        receive_time,create_time
+    </sql>
+</mapper>

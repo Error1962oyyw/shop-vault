@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.TsukasaChan.ShopVault.mapper.product.ProductMapper">
+
+    <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.product.Product">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="category_id" column="category_id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="sub_title" column="sub_title" jdbcType="VARCHAR"/>
+            <result property="main_image" column="main_image" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="DECIMAL"/>
+            <result property="stock" column="stock" jdbcType="INTEGER"/>
+            <result property="stock_warning" column="stock_warning" jdbcType="INTEGER"/>
+            <result property="status" column="status" jdbcType="TINYINT"/>
+            <result property="sales" column="sales" jdbcType="INTEGER"/>
+            <result property="detail_html" column="detail_html" jdbcType="VARCHAR"/>
+            <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,category_id,name,sub_title,main_image,price,
+        stock,stock_warning,status,sales,detail_html,
+        create_time
+    </sql>
+</mapper>

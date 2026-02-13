@@ -5,11 +5,11 @@
 <mapper namespace="com.TsukasaChan.ShopVault.mapper.system.YOLOMappingMapper">
 
     <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.system.YOLOMapping">
-            <id property="id" column="id" />
-            <result property="yolo_label" column="yolo_label" />
-            <result property="category_id" column="category_id" />
-            <result property="confidence_threshold" column="confidence_threshold" />
-            <result property="is_active" column="is_active" />
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="yolo_label" column="yolo_label" jdbcType="VARCHAR"/>
+            <result property="category_id" column="category_id" jdbcType="BIGINT"/>
+            <result property="confidence_threshold" column="confidence_threshold" jdbcType="DECIMAL"/>
+            <result property="is_active" column="is_active" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
