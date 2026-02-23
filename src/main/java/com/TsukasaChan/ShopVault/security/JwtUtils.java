@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class JwtUtils {
 
@@ -21,9 +23,11 @@ public class JwtUtils {
     @Value("${shop-vault.jwt.expiration}")
     private long expiration;
 
-    // 生成 Key
+    // 生成 Key (修复 Base64 解码报错)
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        // 原来的错误写法：byte[] keyBytes = Decoders.BASE64.decode(secret);
+        // 现在的正确写法：直接把普通字符串转为 UTF-8 字节数组
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

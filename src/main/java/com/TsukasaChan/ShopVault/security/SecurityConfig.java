@@ -13,40 +13,38 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-// 在类头上增加 @EnableMethodSecurity 注解
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // ★ 开启方法级权限控制
+@EnableMethodSecurity // 开启方法级权限控制
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    // ★ 新增：注入外部的 PasswordEncoder
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // 禁用 CSRF (因为是前后端分离)
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // ★★★ 放行名单 ★★★
                         .requestMatchers(
-                                "/api/auth/**",      // 登录注册接口
-                                "/api/common/**",    // 公共接口
-                                "/api/system/yolo/**", // YOLO 相关(视情况而定，如果需要登录才能用就去掉)
-                                "/images/**",         // 静态资源
-                                "/api/test/guest"
+                                "/api/auth/**",
+                                "/api/common/**",
+                                "/api/system/yolo/**",
+                                "/images/**",
+                                "/api/test/guest", // 放行测试接口
+                                "/error"
                         ).permitAll()
-                        // 其他所有请求都需要认证
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 不使用 Session，完全基于 Token
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -58,7 +56,8 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        // ★ 修改：使用上面注入的 passwordEncoder
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -67,9 +66,5 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // 密码加密器 (注册时加密，登录时比对)
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // ★ 注意：这里已经删除了原本的 public PasswordEncoder passwordEncoder() 方法！
 }
