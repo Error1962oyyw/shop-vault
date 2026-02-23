@@ -1,7 +1,7 @@
 server:
   port: 8080
-  servlet:
-    context-path: /api # 所有的接口统一加/api前缀，方便前端代理
+  #servlet:
+  #  context-path: /api # 所有的接口统一加/api前缀，方便前端代理
 
 spring:
   application:
