@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.TsukasaChan.ShopVault.mapper.system.YOLOMappingMapper">
+<mapper namespace="com.TsukasaChan.ShopVault.mapper.system.YoloMappingMapper">
 
-    <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.system.YOLOMapping">
+    <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.system.YoloMapping">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="yolo_label" column="yolo_label" jdbcType="VARCHAR"/>
             <result property="category_id" column="category_id" jdbcType="BIGINT"/>

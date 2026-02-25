@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 @Data
 @TableName("sys_yolo_mapping")
-public class YOLOMappingBACKUP implements Serializable {
+public class YoloMappingBACKUP implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
