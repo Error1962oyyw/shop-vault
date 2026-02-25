@@ -14,7 +14,7 @@ import lombok.Data;
  */
 @TableName(value ="sys_yolo_mapping")
 @Data
-public class YOLOMapping implements Serializable {
+public class YoloMapping implements Serializable {
     /**
      * 
      */
@@ -59,7 +59,7 @@ public class YOLOMapping implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        YOLOMapping other = (YOLOMapping) that;
+        YoloMapping other = (YoloMapping) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getYolo_label() == null ? other.getYolo_label() == null : this.getYolo_label().equals(other.getYolo_label()))
             && (this.getCategory_id() == null ? other.getCategory_id() == null : this.getCategory_id().equals(other.getCategory_id()))
