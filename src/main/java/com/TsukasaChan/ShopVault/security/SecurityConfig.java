@@ -4,16 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,9 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final UserDetailsService userDetailsService;
-    // ★ 新增：注入外部的 PasswordEncoder
-    private final PasswordEncoder passwordEncoder;
+
+    // 注意：我们连 UserDetailsService 和 PasswordEncoder 都不用在这里注入了，
+    // Spring Boot 底层会自动发现它们！
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,7 +34,7 @@ public class SecurityConfig {
                                 "/api/common/**",
                                 "/api/system/yolo/**",
                                 "/images/**",
-                                "/api/test/guest", // 放行测试接口
+                                "/api/test/guest",
                                 "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -46,25 +42,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authenticationProvider(authenticationProvider())
+                // ★ 我们删除了 .authenticationProvider(...) 这行代码，让 Spring 自己去组装
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        // ★ 修改：使用上面注入的 passwordEncoder
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
-    }
-
+    // 只保留这一个 Bean 即可，因为 AuthController 的登录接口里需要调用它来认证
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // ★ 注意：这里已经删除了原本的 public PasswordEncoder passwordEncoder() 方法！
+    // ★ 我们彻底删除了 authenticationProvider() 方法！
 }
