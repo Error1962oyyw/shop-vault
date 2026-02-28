@@ -2,6 +2,8 @@ package com.TsukasaChan.ShopVault.controller.product;
 
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.entity.product.Product;
+import com.TsukasaChan.ShopVault.entity.product.Category;
+import com.TsukasaChan.ShopVault.service.product.CategoryService;
 import com.TsukasaChan.ShopVault.service.product.ProductService;
 import com.TsukasaChan.ShopVault.service.system.YoloClientService;
 import com.TsukasaChan.ShopVault.service.system.YoloMappingService;
@@ -23,6 +25,7 @@ public class ProductController {
     private final ProductService productService;
     private final YoloClientService yoloClientService;
     private final YoloMappingService yoloMappingService;
+    private final CategoryService categoryService;
 
     /**
      * 1. 发布商品 (仅限管理员)
@@ -74,30 +77,27 @@ public class ProductController {
      * 3. AI视觉检索 (粗筛+细选逻辑)
      */
     @PostMapping("/yolo-search")
-    public Result<List<Product>> yoloSearch(@RequestParam("file") MultipartFile file) {
+    public Result<List<Category>> yoloSearch(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return Result.error(400, "请上传图片");
         }
 
-        // 调用 Python YOLO
+        // 1. 调用 Python YOLO 获取英文标签
         List<String> labels = yoloClientService.detectImage(file);
         if (labels.isEmpty()) {
             return Result.error(404, "抱歉，AI没能在图中找到认识的商品哦");
         }
 
-        // 根据标签查分类ID
+        // 2. 根据标签去查对应的系统分类 ID (比如查出 [1, 2])
         List<Long> categoryIds = yoloMappingService.findCategoryIdsByLabels(labels);
         if (categoryIds.isEmpty()) {
             return Result.error(404, "图片中识别出了: " + labels + "，但目前商城没有相关的商品分类");
         }
 
-        // 查询对应的商品列表
-        List<Product> products = productService.list(new LambdaQueryWrapper<Product>()
-                .in(Product::getCategoryId, categoryIds)
-                .eq(Product::getStatus, 1)
-                .orderByDesc(Product::getSales)
-                .last("LIMIT 20"));
+        // 3. 重构点：拿着这些 ID，去分类表里查出具体的分类信息 (分类名称、图标等)
+        List<Category> categories = categoryService.listByIds(categoryIds);
 
-        return Result.success(products);
+        // 4. 返回分类列表给前端，让用户做选择
+        return Result.success(categories);
     }
 }
