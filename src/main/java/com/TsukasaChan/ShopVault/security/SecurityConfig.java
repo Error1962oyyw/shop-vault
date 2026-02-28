@@ -31,11 +31,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/common/**",
-                                "/api/system/yolo/**",
                                 "/images/**",
-                                "/api/test/guest",
+                                "/api/product/list",
+                                //"/api/test/guest",
                                 "/error"
+                                //"/api/product/yolo-search"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
