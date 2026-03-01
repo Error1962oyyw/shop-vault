@@ -1,4 +1,4 @@
-package com.TsukasaChan.ShopVault.service.system;
+package com.TsukasaChan.ShopVault.integration;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;

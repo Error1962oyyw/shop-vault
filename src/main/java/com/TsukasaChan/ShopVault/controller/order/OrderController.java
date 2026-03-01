@@ -8,6 +8,7 @@ import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,32 +22,63 @@ public class OrderController {
     private final UserService userService;
 
     private Long getCurrentUserId() {
-        String username = SecurityUtils.getCurrentUsername();
-        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username)).getId();
+        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
     }
 
-    /**
-     * DTO 内部类，用于接收前端传来的下单数据
-     */
     @Data
-    public static class SubmitOrderDto {
-        private List<Long> productIds;
-        private List<Integer> quantities;
+    public static class BuyNowDto {
+        private Long productId;
+        private Integer quantity;
     }
 
-    /**
-     * 提交订单
-     */
-    @PostMapping("/submit")
-    public Result<String> submitOrder(@RequestBody SubmitOrderDto dto) {
-        if (dto.getProductIds() == null || dto.getProductIds().size() != dto.getQuantities().size()) {
-            return Result.error(400, "商品数据异常");
-        }
+    // 1. 立即购买 (详情页)
+    @PostMapping("/buy-now")
+    public Result<String> buyNow(@RequestBody BuyNowDto dto) {
+        String orderNo = orderService.buyNow(getCurrentUserId(), dto.getProductId(), dto.getQuantity());
+        return Result.success("下单成功！单号：" + orderNo);
+    }
 
-        Long userId = getCurrentUserId();
-        // 调用我们刚刚写好的高能事务方法！
-        String orderNo = orderService.createOrder(userId, dto.getProductIds(), dto.getQuantities());
+    // 2. 购物车结算
+    @PostMapping("/cart-checkout")
+    public Result<String> cartCheckout(@RequestBody List<Long> cartItemIds) {
+        String orderNo = orderService.cartCheckout(getCurrentUserId(), cartItemIds);
+        return Result.success("购物车结算成功！单号：" + orderNo);
+    }
 
-        return Result.success("下单成功，订单号：" + orderNo);
+    // 3. 模拟付款 (状态 0 -> 1)
+    @PostMapping("/pay/{orderNo}")
+    public Result<String> payOrder(@PathVariable String orderNo) {
+        orderService.payOrder(orderNo, getCurrentUserId());
+        return Result.success("支付成功！");
+    }
+
+    // 4. 模拟商家发货 (状态 1 -> 2) - 仅限管理员
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/ship/{orderNo}")
+    public Result<String> shipOrder(@PathVariable String orderNo) {
+        orderService.shipOrder(orderNo);
+        return Result.success("发货成功！");
+    }
+
+    // 5. 确认收货并领积分 (状态 2 -> 3)
+    @PostMapping("/receive/{orderNo}")
+    public Result<String> receiveOrder(@PathVariable String orderNo) {
+        orderService.confirmReceive(orderNo, getCurrentUserId());
+        return Result.success("收货成功，100倍积分已到账！");
+    }
+
+    // 6. 申请售后 (状态 2/3 -> 5)
+    @PostMapping("/after-sales/apply/{orderNo}")
+    public Result<String> applyAfterSales(@PathVariable String orderNo) {
+        orderService.applyAfterSales(orderNo, getCurrentUserId());
+        return Result.success("已提交售后申请");
+    }
+
+    // 7. 处理售后 (状态 5 -> 4 或 3) - 仅限管理员
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/after-sales/resolve/{orderNo}")
+    public Result<String> resolveAfterSales(@PathVariable String orderNo, @RequestParam boolean isRefund) {
+        orderService.resolveAfterSales(orderNo, isRefund);
+        return Result.success("售后处理完毕！" + (isRefund ? "已退款并扣除积分" : ""));
     }
 }
