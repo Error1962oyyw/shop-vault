@@ -5,7 +5,7 @@ import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.product.Category;
 import com.TsukasaChan.ShopVault.service.product.CategoryService;
 import com.TsukasaChan.ShopVault.service.product.ProductService;
-import com.TsukasaChan.ShopVault.service.system.YoloClientService;
+import com.TsukasaChan.ShopVault.integration.YoloClientService;
 import com.TsukasaChan.ShopVault.service.system.YoloMappingService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
