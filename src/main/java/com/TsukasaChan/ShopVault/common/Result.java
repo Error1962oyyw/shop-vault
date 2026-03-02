@@ -2,6 +2,7 @@ package com.TsukasaChan.ShopVault.common;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -9,6 +10,7 @@ import java.io.Serializable;
  */
 @Data
 public class Result<T> implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Integer code;    // 状态码：200 成功，500 失败，401 未登录等

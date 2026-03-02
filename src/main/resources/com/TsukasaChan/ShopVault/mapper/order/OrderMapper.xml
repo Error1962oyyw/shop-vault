@@ -6,18 +6,18 @@
 
     <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.order.Order">
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="order_no" column="order_no" jdbcType="VARCHAR"/>
-            <result property="user_id" column="user_id" jdbcType="BIGINT"/>
-            <result property="total_amount" column="total_amount" jdbcType="DECIMAL"/>
-            <result property="pay_amount" column="pay_amount" jdbcType="DECIMAL"/>
+            <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="totalAmount" column="total_amount" jdbcType="DECIMAL"/>
+            <result property="payAmount" column="pay_amount" jdbcType="DECIMAL"/>
             <result property="status" column="status" jdbcType="INTEGER"/>
-            <result property="receiver_snapshot" column="receiver_snapshot" jdbcType="VARCHAR"/>
-            <result property="tracking_company" column="tracking_company" jdbcType="VARCHAR"/>
-            <result property="tracking_no" column="tracking_no" jdbcType="VARCHAR"/>
-            <result property="payment_time" column="payment_time" jdbcType="TIMESTAMP"/>
-            <result property="delivery_time" column="delivery_time" jdbcType="TIMESTAMP"/>
-            <result property="receive_time" column="receive_time" jdbcType="TIMESTAMP"/>
-            <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="receiverSnapshot" column="receiver_snapshot" jdbcType="VARCHAR"/>
+            <result property="trackingCompany" column="tracking_company" jdbcType="VARCHAR"/>
+            <result property="trackingNo" column="tracking_no" jdbcType="VARCHAR"/>
+            <result property="paymentTime" column="payment_time" jdbcType="TIMESTAMP"/>
+            <result property="deliveryTime" column="delivery_time" jdbcType="TIMESTAMP"/>
+            <result property="receiveTime" column="receive_time" jdbcType="TIMESTAMP"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">

@@ -6,12 +6,12 @@
 
     <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.order.OrderItem">
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="order_id" column="order_id" jdbcType="BIGINT"/>
-            <result property="order_no" column="order_no" jdbcType="VARCHAR"/>
-            <result property="product_id" column="product_id" jdbcType="BIGINT"/>
-            <result property="product_name" column="product_name" jdbcType="VARCHAR"/>
-            <result property="product_img" column="product_img" jdbcType="VARCHAR"/>
-            <result property="product_price" column="product_price" jdbcType="DECIMAL"/>
+            <result property="orderId" column="order_id" jdbcType="BIGINT"/>
+            <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+            <result property="productId" column="product_id" jdbcType="BIGINT"/>
+            <result property="productName" column="product_name" jdbcType="VARCHAR"/>
+            <result property="productImg" column="product_img" jdbcType="VARCHAR"/>
+            <result property="productPrice" column="product_price" jdbcType="DECIMAL"/>
             <result property="quantity" column="quantity" jdbcType="INTEGER"/>
     </resultMap>
 
