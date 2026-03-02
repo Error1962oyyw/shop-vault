@@ -6,10 +6,10 @@
 
     <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.system.YoloMapping">
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="yolo_label" column="yolo_label" jdbcType="VARCHAR"/>
-            <result property="category_id" column="category_id" jdbcType="BIGINT"/>
-            <result property="confidence_threshold" column="confidence_threshold" jdbcType="DECIMAL"/>
-            <result property="is_active" column="is_active" jdbcType="TINYINT"/>
+            <result property="yoloLabel" column="yolo_label" jdbcType="VARCHAR"/>
+            <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
+            <result property="confidenceThreshold" column="confidence_threshold" jdbcType="DECIMAL"/>
+            <result property="isActive" column="is_active" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">

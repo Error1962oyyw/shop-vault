@@ -6,14 +6,14 @@
 
     <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.system.Address">
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="user_id" column="user_id" jdbcType="BIGINT"/>
-            <result property="receiver_name" column="receiver_name" jdbcType="VARCHAR"/>
-            <result property="receiver_phone" column="receiver_phone" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="receiverName" column="receiver_name" jdbcType="VARCHAR"/>
+            <result property="receiverPhone" column="receiver_phone" jdbcType="VARCHAR"/>
             <result property="province" column="province" jdbcType="VARCHAR"/>
             <result property="city" column="city" jdbcType="VARCHAR"/>
             <result property="region" column="region" jdbcType="VARCHAR"/>
-            <result property="detail_address" column="detail_address" jdbcType="VARCHAR"/>
-            <result property="is_default" column="is_default" jdbcType="TINYINT"/>
+            <result property="detailAddress" column="detail_address" jdbcType="VARCHAR"/>
+            <result property="isDefault" column="is_default" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">

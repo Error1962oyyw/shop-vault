@@ -7,12 +7,12 @@
     <resultMap id="BaseResultMap" type="com.TsukasaChan.ShopVault.entity.marketing.Activity">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
-            <result property="start_time" column="start_time" jdbcType="TIMESTAMP"/>
-            <result property="end_time" column="end_time" jdbcType="TIMESTAMP"/>
+            <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+            <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
             <result property="type" column="type" jdbcType="TINYINT"/>
-            <result property="discount_rate" column="discount_rate" jdbcType="DECIMAL"/>
-            <result property="point_cost" column="point_cost" jdbcType="INTEGER"/>
-            <result property="product_id" column="product_id" jdbcType="BIGINT"/>
+            <result property="discountRate" column="discount_rate" jdbcType="DECIMAL"/>
+            <result property="pointCost" column="point_cost" jdbcType="INTEGER"/>
+            <result property="productId" column="product_id" jdbcType="BIGINT"/>
             <result property="status" column="status" jdbcType="TINYINT"/>
     </resultMap>
 

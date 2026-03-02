@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         BigDecimal payAmount = totalAmount;
         boolean isMemberDay = (LocalDate.now().getDayOfMonth() % 10 == 8);
         if (isMemberDay) {
-            payAmount = totalAmount.multiply(new BigDecimal("0.8")).setScale(2, BigDecimal.ROUND_HALF_UP);
+            payAmount = totalAmount.multiply(new BigDecimal("0.8")).setScale(2, RoundingMode.HALF_UP);
         }
         Order order = new Order();
         order.setOrderNo(orderNo);
@@ -137,11 +138,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public void payOrder(String orderNo, Long userId) {
-        Order order = this.getOne(new LambdaQueryWrapper<Order>().eq(Order::getOrderNo, orderNo).eq(Order::getUserId, userId));
-        if (order != null && order.getStatus() == 0) {
-            order.setStatus(1); // 1: 待发货
-            this.updateById(order);
+        Order order = this.getOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNo, orderNo)
+                .eq(Order::getUserId, userId)); // 严格限制只能查自己的单子
+
+        if (order == null) {
+            throw new RuntimeException("订单不存在或您无权操作该订单！");
         }
+        if (order.getStatus() != 0) {
+            throw new RuntimeException("订单状态异常，当前无法进行支付！");
+        }
+
+        order.setStatus(1); // 1: 待发货
+        this.updateById(order);
     }
 
     @Override
@@ -173,30 +182,62 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public void applyAfterSales(String orderNo, Long userId) {
-        Order order = this.getOne(new LambdaQueryWrapper<Order>().eq(Order::getOrderNo, orderNo).eq(Order::getUserId, userId));
-        // 允许收货前后申请售后
-        if (order != null && (order.getStatus() == 2 || order.getStatus() == 3)) {
-            order.setStatus(5); // 5: 售后中
-            this.updateById(order);
+        Order order = this.getOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNo, orderNo)
+                .eq(Order::getUserId, userId));
+
+        if (order == null) {
+            throw new RuntimeException("订单不存在或您无权操作该订单！");
         }
+        if (order.getStatus() == 5) {
+            throw new RuntimeException("该订单正在售后处理中，请勿重复提交！");
+        }
+        if (order.getStatus() != 2 && order.getStatus() != 3) {
+            throw new RuntimeException("当前订单状态不支持申请售后！(仅待收货或已完成的订单可申请)");
+        }
+
+        order.setStatus(5); // 5: 售后中
+        this.updateById(order);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void resolveAfterSales(String orderNo, boolean isRefund) {
         Order order = this.getOne(new LambdaQueryWrapper<Order>().eq(Order::getOrderNo, orderNo));
-        if (order == null || order.getStatus() != 5) return;
+        if (order == null || order.getStatus() != 5) {
+            throw new RuntimeException("找不到需要处理的售后订单");
+        }
 
         if (isRefund) {
             order.setStatus(4); // 售后同意退款，订单关闭
-            // ★ 如果已经发过积分了(说明之前确认过收货)，则扣回 1:100 的积分
+
+            // 计算当初发了多少积分 (实付金额 * 100)
             int deductPoints = order.getPayAmount().multiply(new BigDecimal("100")).intValue();
             User user = userService.getById(order.getUserId());
-            user.setPoints(Math.max(0, user.getPoints() - deductPoints)); // 保证积分不为负数
+
+            if (user.getPoints() >= deductPoints) {
+                // 积分够扣，直接扣除
+                user.setPoints(user.getPoints() - deductPoints);
+            } else {
+                // ★ 进阶逻辑：积分不够扣了！把差的积分折算回钱，从退款里扣除
+                int missingPoints = deductPoints - user.getPoints(); // 算算欠了多少积分
+                // 100 积分 = 1 元
+                BigDecimal deductMoney = new BigDecimal(missingPoints).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+
+                user.setPoints(0); // 积分直接清零
+
+                // 此时退给用户的钱 = 订单实付 - 抵扣掉的钱
+                BigDecimal actualRefund = order.getPayAmount().subtract(deductMoney);
+
+                // 为了记录最终退了多少钱，我们可以把这个值更新到订单表里（这里假设暂存在 payAmount 字段做记录，或者你有 refundAmount 字段更好）
+                order.setPayAmount(actualRefund.max(BigDecimal.ZERO));
+            }
             userService.updateById(user);
-            // 进阶：这里可以加上恢复库存的代码
+
+            // TODO: (进阶) 根据 OrderItem 表里的数据，把商品的 stock 加回去
+
         } else {
-            order.setStatus(3); // 售后拒绝或只是换货，订单流转回已完成
+            order.setStatus(3); // 售后拒绝或处理完毕(非退款)，流转回已完成
         }
         this.updateById(order);
     }

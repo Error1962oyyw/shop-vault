@@ -28,12 +28,12 @@ public class YoloClientService {
      */
     public List<String> detectImage(MultipartFile file) {
         List<String> labels = new ArrayList<>();
-        try {
-            // 使用 Hutool 构建包含文件的 POST 表单请求
-            HttpResponse response = HttpRequest.post(yoloUrl)
-                    .form("file", file.getBytes(), file.getOriginalFilename()) // 模拟 form-data 上传
-                    .timeout(10000) // 10秒超时
-                    .execute();
+        try (
+                // 使用 Hutool 构建包含文件的 POST 表单请求
+                HttpResponse response = HttpRequest.post(yoloUrl)
+                        .form("file", file.getBytes(), file.getOriginalFilename()) // 模拟 form-data 上传
+                        .timeout(10000) // 10秒超时
+                        .execute()) {
 
             if (response.isOk()) {
                 String body = response.body();

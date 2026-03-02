@@ -1,22 +1,33 @@
 package com.TsukasaChan.ShopVault.service.system.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.TsukasaChan.ShopVault.entity.system.Address;
-import com.TsukasaChan.ShopVault.service.system.AddressService;
 import com.TsukasaChan.ShopVault.mapper.system.AddressMapper;
+import com.TsukasaChan.ShopVault.service.system.AddressService;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
-* @author Error1962
-* @description 针对表【sys_address(收货地址表)】的数据库操作Service实现
-* @createDate 2026-02-13 20:45:10
-*/
 @Service
-public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address>
-    implements AddressService{
+public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> implements AddressService {
 
+    /**
+     * 设置默认地址
+     * @Transactional 保证数据一致性
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void setDefaultAddress(Long addressId, Long userId) {
+        // 1. 将该用户所有的地址 is_default 设为 0 (非默认)
+        LambdaUpdateWrapper<Address> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Address::getUserId, userId)
+                .set(Address::getIsDefault, 0);
+        this.update(updateWrapper);
+
+        // 2. 将指定的地址 is_default 设为 1 (默认)
+        Address targetAddress = new Address();
+        targetAddress.setId(addressId);
+        targetAddress.setIsDefault(1);
+        this.updateById(targetAddress);
+    }
 }
-
-
-
-
