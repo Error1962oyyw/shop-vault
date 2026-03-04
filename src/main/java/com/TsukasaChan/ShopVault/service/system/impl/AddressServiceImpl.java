@@ -21,13 +21,13 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
         // 1. 将该用户所有的地址 is_default 设为 0 (非默认)
         LambdaUpdateWrapper<Address> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Address::getUserId, userId)
-                .set(Address::getIsDefault, 0);
+                .set(Address::getIsDefault, false);
         this.update(updateWrapper);
 
         // 2. 将指定的地址 is_default 设为 1 (默认)
         Address targetAddress = new Address();
         targetAddress.setId(addressId);
-        targetAddress.setIsDefault(1);
+        targetAddress.setIsDefault(true);
         this.updateById(targetAddress);
     }
 }

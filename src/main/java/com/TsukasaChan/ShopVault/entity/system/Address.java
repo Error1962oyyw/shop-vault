@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 收货地址表
@@ -37,7 +38,9 @@ public class Address implements Serializable {
     private String detailAddress;
 
     /**
-     * 是否默认地址 1:是 0:否
+     * 是否默认地址 true:是 false:否
      */
     private Boolean isDefault;
+
+    private LocalDateTime createTime;
 }
