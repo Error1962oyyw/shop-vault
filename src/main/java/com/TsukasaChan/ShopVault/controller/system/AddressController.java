@@ -34,7 +34,7 @@ public class AddressController {
 
         // 如果是该用户的第一个地址，自动设为默认
         long count = addressService.count(new LambdaQueryWrapper<Address>().eq(Address::getUserId, userId));
-        address.setIsDefault(count == 0 ? 1 : 0);
+        address.setIsDefault(count == 0);
 
         addressService.save(address);
         return Result.success("地址添加成功");

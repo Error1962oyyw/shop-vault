@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -29,7 +30,7 @@ public class Comment implements Serializable {
 
     private Long userId;
 
-    private Integer star;
+    private BigDecimal star;
 
     private String content;
 
