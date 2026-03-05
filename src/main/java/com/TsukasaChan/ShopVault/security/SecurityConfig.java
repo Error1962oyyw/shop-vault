@@ -34,7 +34,8 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/api/product/list",
                                 //"/api/test/guest",
-                                "/error"
+                                "/error",
+                                "/api/recommendation/guess-you-like"
                                 //"/api/product/yolo-search"
                         ).permitAll()
                         .anyRequest().authenticated()

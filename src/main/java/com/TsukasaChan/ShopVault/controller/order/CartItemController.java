@@ -22,9 +22,7 @@ public class CartItemController {
 
     // 获取当前用户ID的私有方法
     private Long getCurrentUserId() {
-        String username = SecurityUtils.getCurrentUsername();
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
-        return user.getId();
+        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
     }
 
     /**

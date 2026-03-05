@@ -1,9 +1,9 @@
-package com.TsukasaChan.ShopVault.system.service.impl;
+package com.TsukasaChan.ShopVault.service.system.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.TsukasaChan.ShopVault.entity.system.Log;
-import com.TsukasaChan.ShopVault.system.service.LogService;
-import com.TsukasaChan.ShopVault.system.mapper.LogMapper;
+import com.TsukasaChan.ShopVault.service.system.LogService;
+import com.TsukasaChan.ShopVault.mapper.system.LogMapper;
 import org.springframework.stereotype.Service;
 
 /**

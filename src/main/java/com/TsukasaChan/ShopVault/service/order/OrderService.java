@@ -15,8 +15,4 @@ public interface OrderService extends IService<Order> {
     void shipOrder(String orderNo);
     // 确认收货 (发积分 1:100)
     void confirmReceive(String orderNo, Long userId);
-    // 申请售后
-    void applyAfterSales(String orderNo, Long userId);
-    // 完成售后 (退款并扣回积分)
-    void resolveAfterSales(String orderNo, boolean isRefund);
 }

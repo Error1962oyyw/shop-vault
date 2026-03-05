@@ -1,4 +1,4 @@
-package com.TsukasaChan.ShopVault.system.mapper;
+package com.TsukasaChan.ShopVault.mapper.system;
 
 import com.TsukasaChan.ShopVault.entity.system.ChatMessage;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
