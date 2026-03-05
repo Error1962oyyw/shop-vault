@@ -66,19 +66,4 @@ public class OrderController {
         orderService.confirmReceive(orderNo, getCurrentUserId());
         return Result.success("收货成功，100倍积分已到账！");
     }
-
-    // 6. 申请售后 (状态 2/3 -> 5)
-    @PostMapping("/after-sales/apply/{orderNo}")
-    public Result<String> applyAfterSales(@PathVariable String orderNo) {
-        orderService.applyAfterSales(orderNo, getCurrentUserId());
-        return Result.success("已提交售后申请");
-    }
-
-    // 7. 处理售后 (状态 5 -> 4 或 3) - 仅限管理员
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/after-sales/resolve/{orderNo}")
-    public Result<String> resolveAfterSales(@PathVariable String orderNo, @RequestParam boolean isRefund) {
-        orderService.resolveAfterSales(orderNo, isRefund);
-        return Result.success("售后处理完毕！" + (isRefund ? "已退款并扣除积分" : ""));
-    }
 }

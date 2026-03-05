@@ -27,7 +27,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
         // 2. 将指定的地址 is_default 设为 1 (默认)
         Address targetAddress = new Address();
         targetAddress.setId(addressId);
-        targetAddress.setIsDefault(true);
+        targetAddress.setIsDefault(1);
         this.updateById(targetAddress);
     }
 }

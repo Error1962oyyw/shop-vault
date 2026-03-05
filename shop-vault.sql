@@ -36,7 +36,7 @@ CREATE TABLE `sys_address` (
   `city` varchar(64) DEFAULT NULL COMMENT '市',
   `region` varchar(64) DEFAULT NULL COMMENT '区',
   `detail_address` varchar(255) NOT NULL COMMENT '详细地址',
-  `is_default` boolean DEFAULT false COMMENT '是否默认地址',
+  `is_default` tinyint(1) DEFAULT '0' COMMENT '是否默认地址:0否 1是',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收货地址表';

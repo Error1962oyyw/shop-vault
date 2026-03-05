@@ -1,9 +1,9 @@
-package com.TsukasaChan.ShopVault.system.service.impl;
+package com.TsukasaChan.ShopVault.service.system.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.TsukasaChan.ShopVault.entity.system.ChatMessage;
-import com.TsukasaChan.ShopVault.system.service.ChatMessageService;
-import com.TsukasaChan.ShopVault.system.mapper.ChatMessageMapper;
+import com.TsukasaChan.ShopVault.service.system.ChatMessageService;
+import com.TsukasaChan.ShopVault.mapper.system.ChatMessageMapper;
 import org.springframework.stereotype.Service;
 
 /**
