@@ -33,14 +33,29 @@ public class ChatMessageController {
     }
 
     /**
-     * ★ 提取的公共方法：获取两人之间的聊天记录，消除重复代码警告
+     * ★ 终极去重公共方法：获取记录并自动处理已读状态，直接返回 Result
+     * @param myId 当前请求人的ID
+     * @param peerId 对方的ID
+     * @param unreadSenderId 需要被标记为已读的消息的发送人ID
+     * @param unreadReceiverId 需要被标记为已读的消息的接收人ID
      */
-    private List<ChatMessage> getChatHistory(Long userA, Long userB) {
-        return chatMessageService.list(new LambdaQueryWrapper<ChatMessage>()
-                .and(wrapper -> wrapper.eq(ChatMessage::getSenderId, userA).eq(ChatMessage::getReceiverId, userB)
+    private Result<List<ChatMessage>> fetchHistoryAndMarkRead(Long myId, Long peerId, Long unreadSenderId, Long unreadReceiverId) {
+        // 1. 获取聊天记录
+        List<ChatMessage> history = chatMessageService.list(new LambdaQueryWrapper<ChatMessage>()
+                .and(wrapper -> wrapper.eq(ChatMessage::getSenderId, myId).eq(ChatMessage::getReceiverId, peerId)
                         .or()
-                        .eq(ChatMessage::getSenderId, userB).eq(ChatMessage::getReceiverId, userA))
+                        .eq(ChatMessage::getSenderId, peerId).eq(ChatMessage::getReceiverId, myId))
                 .orderByAsc(ChatMessage::getCreateTime));
+
+        // 2. 将对方发给我的未读消息标记为已读
+        chatMessageService.update(new LambdaUpdateWrapper<ChatMessage>()
+                .eq(ChatMessage::getSenderId, unreadSenderId)
+                .eq(ChatMessage::getReceiverId, unreadReceiverId)
+                .eq(ChatMessage::getIsRead, 0)
+                .set(ChatMessage::getIsRead, 1));
+
+        // 3. 直接组装返回结果
+        return Result.success(history);
     }
 
     // ================== 用户端接口 ==================
@@ -60,17 +75,8 @@ public class ChatMessageController {
     public Result<List<ChatMessage>> getUserHistory() {
         Long userId = getCurrentUserId();
         Long adminId = getAdminId();
-
-        List<ChatMessage> history = getChatHistory(userId, adminId);
-
-        // 标记客服发给我的消息为已读 (1)
-        chatMessageService.update(new LambdaUpdateWrapper<ChatMessage>()
-                .eq(ChatMessage::getSenderId, adminId)
-                .eq(ChatMessage::getReceiverId, userId)
-                .eq(ChatMessage::getIsRead, 0)
-                .set(ChatMessage::getIsRead, 1)); // 1代表已读
-
-        return Result.success(history);
+        // 用户查历史：把 客服(adminId) 发给 用户(userId) 的消息标为已读
+        return fetchHistoryAndMarkRead(userId, adminId, adminId, userId);
     }
 
     // ================== 管理端接口 ==================
@@ -92,16 +98,7 @@ public class ChatMessageController {
     @GetMapping("/admin/history/{userId}")
     public Result<List<ChatMessage>> getAdminHistory(@PathVariable Long userId) {
         Long adminId = getCurrentUserId();
-
-        List<ChatMessage> history = getChatHistory(userId, adminId);
-
-        // 标记用户发给客服的消息为已读 (1)
-        chatMessageService.update(new LambdaUpdateWrapper<ChatMessage>()
-                .eq(ChatMessage::getSenderId, userId)
-                .eq(ChatMessage::getReceiverId, adminId)
-                .eq(ChatMessage::getIsRead, 0)
-                .set(ChatMessage::getIsRead, 1));
-
-        return Result.success(history);
+        // 客服查历史：把 用户(userId) 发给 客服(adminId) 的消息标为已读
+        return fetchHistoryAndMarkRead(adminId, userId, userId, adminId);
     }
 }
