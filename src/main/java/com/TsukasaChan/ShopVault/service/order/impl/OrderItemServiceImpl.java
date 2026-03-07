@@ -16,7 +16,3 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemMapper, OrderItem
     implements OrderItemService{
 
 }
-
-
-
-

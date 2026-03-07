@@ -16,7 +16,3 @@ public class ChatMessageServiceImpl extends ServiceImpl<ChatMessageMapper, ChatM
     implements ChatMessageService{
 
 }
-
-
-
-

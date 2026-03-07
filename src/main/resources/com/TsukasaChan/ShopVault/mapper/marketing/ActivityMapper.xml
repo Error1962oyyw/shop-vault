@@ -14,10 +14,12 @@
             <result property="pointCost" column="point_cost" jdbcType="INTEGER"/>
             <result property="productId" column="product_id" jdbcType="BIGINT"/>
             <result property="status" column="status" jdbcType="TINYINT"/>
+            <result property="ruleExpression" column="rule_expression" jdbcType="VARCHAR"/>
+            <result property="pointsMultiplier" column="points_multiplier" jdbcType="DECIMAL"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,name,start_time,end_time,type,discount_rate,
-        point_cost,product_id,status
+        point_cost,product_id,status,rule_expression,points_multiplier
     </sql>
 </mapper>

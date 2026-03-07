@@ -7,20 +7,21 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `username` varchar(64) NOT NULL COMMENT '用户名',
-  `password` varchar(100) NOT NULL COMMENT '加密密码',
-  `nickname` varchar(64) DEFAULT NULL COMMENT '昵称',
-  `avatar` varchar(500) DEFAULT NULL COMMENT '头像URL',
-  `phone` varchar(20) DEFAULT NULL COMMENT '手机号',
-  `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
-  `balance` decimal(10,2) DEFAULT '0.00' COMMENT '钱包余额(模拟支付用)',
-  `points` int(11) DEFAULT '0' COMMENT '当前积分',
-  `status` tinyint(1) DEFAULT '1' COMMENT '状态 1:正常 0:冻结',
-  `role` varchar(20) DEFAULT 'USER' COMMENT '角色: USER/ADMIN',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_username` (`username`)
+                            `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                            `username` varchar(64) NOT NULL COMMENT '用户名',
+                            `password` varchar(100) NOT NULL COMMENT '加密密码',
+                            `nickname` varchar(64) DEFAULT NULL COMMENT '昵称',
+                            `avatar` varchar(500) DEFAULT NULL COMMENT '头像URL',
+                            `phone` varchar(20) DEFAULT NULL COMMENT '手机号',
+                            `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
+                            `balance` decimal(10,2) DEFAULT '0.00' COMMENT '钱包余额(模拟支付用)',
+                            `points` int(11) DEFAULT '0' COMMENT '当前积分',
+                            `status` tinyint(1) DEFAULT '1' COMMENT '状态 1:正常 0:冻结',
+                            `role` varchar(20) DEFAULT 'USER' COMMENT '角色: USER/ADMIN',
+                            `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
+                            `credit_score` int(11) DEFAULT '100' COMMENT '信誉分(影响售后审批)',
+                            PRIMARY KEY (`id`),
+                            UNIQUE KEY `uk_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 -- ----------------------------
@@ -28,17 +29,17 @@ CREATE TABLE `sys_user` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_address`;
 CREATE TABLE `sys_address` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
-  `receiver_name` varchar(64) NOT NULL COMMENT '收货人姓名',
-  `receiver_phone` varchar(20) NOT NULL COMMENT '收货人电话',
-  `province` varchar(64) DEFAULT NULL COMMENT '省',
-  `city` varchar(64) DEFAULT NULL COMMENT '市',
-  `region` varchar(64) DEFAULT NULL COMMENT '区',
-  `detail_address` varchar(255) NOT NULL COMMENT '详细地址',
-  `is_default` tinyint(1) DEFAULT '0' COMMENT '是否默认地址:0否 1是',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                               `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                               `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                               `receiver_name` varchar(64) NOT NULL COMMENT '收货人姓名',
+                               `receiver_phone` varchar(20) NOT NULL COMMENT '收货人电话',
+                               `province` varchar(64) DEFAULT NULL COMMENT '省',
+                               `city` varchar(64) DEFAULT NULL COMMENT '市',
+                               `region` varchar(64) DEFAULT NULL COMMENT '区',
+                               `detail_address` varchar(255) NOT NULL COMMENT '详细地址',
+                               `is_default` tinyint(1) DEFAULT '0' COMMENT '是否默认地址:0否 1是',
+                               `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收货地址表';
 
 -- ----------------------------
@@ -46,13 +47,13 @@ CREATE TABLE `sys_address` (
 -- ----------------------------
 DROP TABLE IF EXISTS `pms_category`;
 CREATE TABLE `pms_category` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `name` varchar(64) NOT NULL COMMENT '分类名称 (如: 数码, 服装)',
-  `parent_id` bigint(20) DEFAULT '0' COMMENT '父分类ID (0为一级分类)',
-  `level` int(1) DEFAULT '1' COMMENT '层级 (1:一级 2:二级)',
-  `icon` varchar(255) DEFAULT NULL COMMENT '图标URL',
-  `sort` int(11) DEFAULT '0' COMMENT '排序权重',
-  PRIMARY KEY (`id`)
+                                `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                `name` varchar(64) NOT NULL COMMENT '分类名称 (如: 数码, 服装)',
+                                `parent_id` bigint(20) DEFAULT '0' COMMENT '父分类ID (0为一级分类)',
+                                `level` int(1) DEFAULT '1' COMMENT '层级 (1:一级 2:二级)',
+                                `icon` varchar(255) DEFAULT NULL COMMENT '图标URL',
+                                `sort` int(11) DEFAULT '0' COMMENT '排序权重',
+                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品分类表';
 
 -- ----------------------------
@@ -61,13 +62,13 @@ CREATE TABLE `pms_category` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_yolo_mapping`;
 CREATE TABLE `sys_yolo_mapping` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `yolo_label` varchar(64) NOT NULL COMMENT 'YOLO模型输出的标签 (如: cup, backpack)',
-  `category_id` bigint(20) NOT NULL COMMENT '关联的系统分类ID',
-  `confidence_threshold` decimal(4,2) DEFAULT '0.50' COMMENT '置信度阈值 (过滤低可信度识别)',
-  `is_active` tinyint(1) DEFAULT '1' COMMENT '是否启用映射',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_yolo` (`yolo_label`)
+                                    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                    `yolo_label` varchar(64) NOT NULL COMMENT 'YOLO模型输出的标签 (如: cup, backpack)',
+                                    `category_id` bigint(20) NOT NULL COMMENT '关联的系统分类ID',
+                                    `confidence_threshold` decimal(4,2) DEFAULT '0.50' COMMENT '置信度阈值 (过滤低可信度识别)',
+                                    `is_active` tinyint(1) DEFAULT '1' COMMENT '是否启用映射',
+                                    PRIMARY KEY (`id`),
+                                    UNIQUE KEY `uk_yolo` (`yolo_label`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI视觉标签映射表';
 
 -- ----------------------------
@@ -75,19 +76,19 @@ CREATE TABLE `sys_yolo_mapping` (
 -- ----------------------------
 DROP TABLE IF EXISTS `pms_product`;
 CREATE TABLE `pms_product` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `category_id` bigint(20) NOT NULL COMMENT '分类ID',
-  `name` varchar(255) NOT NULL COMMENT '商品名称',
-  `sub_title` varchar(255) DEFAULT NULL COMMENT '副标题/卖点',
-  `main_image` varchar(500) NOT NULL COMMENT '主图',
-  `price` decimal(10,2) NOT NULL COMMENT '销售价格',
-  `stock` int(11) NOT NULL COMMENT '库存数量',
-  `stock_warning` int(11) DEFAULT '10' COMMENT '库存预警阈值',
-  `status` tinyint(1) DEFAULT '1' COMMENT '状态 1:上架 0:下架',
-  `sales` int(11) DEFAULT '0' COMMENT '销量 (用于热销推荐)',
-  `detail_html` text COMMENT '商品详情(富文本)',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                               `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                               `category_id` bigint(20) NOT NULL COMMENT '分类ID',
+                               `name` varchar(255) NOT NULL COMMENT '商品名称',
+                               `sub_title` varchar(255) DEFAULT NULL COMMENT '副标题/卖点',
+                               `main_image` varchar(500) NOT NULL COMMENT '主图',
+                               `price` decimal(10,2) NOT NULL COMMENT '销售价格',
+                               `stock` int(11) NOT NULL COMMENT '库存数量',
+                               `stock_warning` int(11) DEFAULT '10' COMMENT '库存预警阈值',
+                               `status` tinyint(1) DEFAULT '1' COMMENT '状态 1:上架 0:下架',
+                               `sales` int(11) DEFAULT '0' COMMENT '销量 (用于热销推荐)',
+                               `detail_html` text COMMENT '商品详情(富文本)',
+                               `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
 
 -- ----------------------------
@@ -95,12 +96,12 @@ CREATE TABLE `pms_product` (
 -- ----------------------------
 DROP TABLE IF EXISTS `oms_cart_item`;
 CREATE TABLE `oms_cart_item` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
-  `product_id` bigint(20) NOT NULL COMMENT '商品ID',
-  `quantity` int(11) DEFAULT '1' COMMENT '购买数量',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                                 `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                 `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                                 `product_id` bigint(20) NOT NULL COMMENT '商品ID',
+                                 `quantity` int(11) DEFAULT '1' COMMENT '购买数量',
+                                 `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='购物车表';
 
 -- ----------------------------
@@ -108,21 +109,24 @@ CREATE TABLE `oms_cart_item` (
 -- ----------------------------
 DROP TABLE IF EXISTS `oms_order`;
 CREATE TABLE `oms_order` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `order_no` varchar(64) NOT NULL COMMENT '订单编号(唯一)',
-  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
-  `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额',
-  `pay_amount` decimal(10,2) NOT NULL COMMENT '实付金额 (扣除优惠后)',
-  `status` int(2) DEFAULT '0' COMMENT '状态: 0待付款 1待发货 2已发货 3已完成 4已关闭 5售后中',
-  `receiver_snapshot` text COMMENT '收货人信息快照(JSON格式，防止地址修改影响旧订单)',
-  `tracking_company` varchar(64) DEFAULT NULL COMMENT '物流公司',
-  `tracking_no` varchar(64) DEFAULT NULL COMMENT '物流单号',
-  `payment_time` datetime DEFAULT NULL COMMENT '支付时间',
-  `delivery_time` datetime DEFAULT NULL COMMENT '发货时间',
-  `receive_time` datetime DEFAULT NULL COMMENT '确认收货时间',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_order_no` (`order_no`)
+                             `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                             `order_no` varchar(64) NOT NULL COMMENT '订单编号(唯一)',
+                             `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                             `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额',
+                             `pay_amount` decimal(10,2) NOT NULL COMMENT '实付金额 (扣除优惠后)',
+                             `status` int(2) DEFAULT '0' COMMENT '状态: 0待付款 1待发货 2已发货 3已完成 4已关闭 5售后中',
+                             `receiver_snapshot` text COMMENT '收货人信息快照(JSON格式，防止地址修改影响旧订单)',
+                             `tracking_company` varchar(64) DEFAULT NULL COMMENT '物流公司',
+                             `tracking_no` varchar(64) DEFAULT NULL COMMENT '物流单号',
+                             `payment_time` datetime DEFAULT NULL COMMENT '支付时间',
+                             `delivery_time` datetime DEFAULT NULL COMMENT '发货时间',
+                             `receive_time` datetime DEFAULT NULL COMMENT '确认收货时间',
+                             `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                             `auto_receive_time` datetime DEFAULT NULL COMMENT '自动收货时间(发货后+10天)',
+                             `is_extended` tinyint(1) DEFAULT '0' COMMENT '是否已延长收货: 0否 1是',
+                             `close_time` datetime DEFAULT NULL COMMENT '订单关闭时间',
+                             PRIMARY KEY (`id`),
+                             UNIQUE KEY `uk_order_no` (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
 
 -- ----------------------------
@@ -130,15 +134,15 @@ CREATE TABLE `oms_order` (
 -- ----------------------------
 DROP TABLE IF EXISTS `oms_order_item`;
 CREATE TABLE `oms_order_item` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `order_id` bigint(20) NOT NULL COMMENT '订单ID',
-  `order_no` varchar(64) DEFAULT NULL COMMENT '订单编号',
-  `product_id` bigint(20) NOT NULL COMMENT '商品ID',
-  `product_name` varchar(255) NOT NULL COMMENT '商品名称',
-  `product_img` varchar(500) DEFAULT NULL COMMENT '商品图片',
-  `product_price` decimal(10,2) NOT NULL COMMENT '购买时的单价',
-  `quantity` int(11) DEFAULT '1' COMMENT '购买数量',
-  PRIMARY KEY (`id`)
+                                  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                  `order_id` bigint(20) NOT NULL COMMENT '订单ID',
+                                  `order_no` varchar(64) DEFAULT NULL COMMENT '订单编号',
+                                  `product_id` bigint(20) NOT NULL COMMENT '商品ID',
+                                  `product_name` varchar(255) NOT NULL COMMENT '商品名称',
+                                  `product_img` varchar(500) DEFAULT NULL COMMENT '商品图片',
+                                  `product_price` decimal(10,2) NOT NULL COMMENT '购买时的单价',
+                                  `quantity` int(11) DEFAULT '1' COMMENT '购买数量',
+                                  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单商品详情表';
 
 -- ----------------------------
@@ -147,13 +151,13 @@ CREATE TABLE `oms_order_item` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sms_points_record`;
 CREATE TABLE `sms_points_record` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
-  `type` tinyint(1) NOT NULL COMMENT '类型: 1签到 2购物奖励 3兑换消耗 4活动赠送',
-  `amount` int(11) NOT NULL COMMENT '变动数量 (正数为增，负数为减)',
-  `description` varchar(255) DEFAULT NULL COMMENT '描述 (如: 2026/xx/xx 每日签到)',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                                     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                     `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                                     `type` tinyint(1) NOT NULL COMMENT '类型: 1签到 2购物奖励 3兑换消耗 4活动赠送',
+                                     `amount` int(11) NOT NULL COMMENT '变动数量 (正数为增，负数为减)',
+                                     `description` varchar(255) DEFAULT NULL COMMENT '描述 (如: 2026/xx/xx 每日签到)',
+                                     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='积分变动记录表';
 
 -- ----------------------------
@@ -161,16 +165,18 @@ CREATE TABLE `sms_points_record` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sms_activity`;
 CREATE TABLE `sms_activity` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `name` varchar(100) NOT NULL COMMENT '活动名称 (如: 2月会员日)',
-  `start_time` datetime NOT NULL COMMENT '开始时间',
-  `end_time` datetime NOT NULL COMMENT '结束时间',
-  `type` tinyint(1) DEFAULT '1' COMMENT '类型: 1折扣活动 2积分兑换商品',
-  `discount_rate` decimal(3,2) DEFAULT '1.00' COMMENT '折扣率 (如0.85)',
-  `point_cost` int(11) DEFAULT '0' COMMENT '兑换所需积分',
-  `product_id` bigint(20) DEFAULT NULL COMMENT '关联商品ID (若是兑换活动)',
-  `status` tinyint(1) DEFAULT '1' COMMENT '状态 1启用 0停用',
-  PRIMARY KEY (`id`)
+                                `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                `name` varchar(100) NOT NULL COMMENT '活动名称 (如: 2月会员日)',
+                                `start_time` datetime NOT NULL COMMENT '开始时间',
+                                `end_time` datetime NOT NULL COMMENT '结束时间',
+                                `type` tinyint(1) DEFAULT '1' COMMENT '类型: 1折扣活动 2积分兑换商品',
+                                `discount_rate` decimal(3,2) DEFAULT '1.00' COMMENT '折扣率 (如0.85)',
+                                `point_cost` int(11) DEFAULT '0' COMMENT '兑换所需积分',
+                                `product_id` bigint(20) DEFAULT NULL COMMENT '关联商品ID (若是兑换活动)',
+                                `status` tinyint(1) DEFAULT '1' COMMENT '状态 1启用 0停用',
+                                `rule_expression` varchar(255) DEFAULT NULL COMMENT '规则表达式(如: 8代表每月8号, 4代表周四)',
+                                `points_multiplier` decimal(4,2) DEFAULT '1.00' COMMENT '积分获取倍率(如 2.0 代表双倍积分)',
+                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='营销活动与积分商城表';
 
 -- ----------------------------
@@ -179,16 +185,16 @@ CREATE TABLE `sms_activity` (
 -- ----------------------------
 DROP TABLE IF EXISTS `pms_comment`;
 CREATE TABLE `pms_comment` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `order_id` bigint(20) NOT NULL COMMENT '订单ID',
-  `product_id` bigint(20) NOT NULL COMMENT '商品ID',
-  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
-  `star` decimal(2,1) DEFAULT '5.0' COMMENT '星级 1.0-5.0',
-  `content` text COMMENT '评价内容',
-  `images` text COMMENT '评价图片(JSON数组)',
-  `audit_status` tinyint(1) DEFAULT '0' COMMENT '审核状态: 0待审核 1通过 2拒绝',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                               `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                               `order_id` bigint(20) NOT NULL COMMENT '订单ID',
+                               `product_id` bigint(20) NOT NULL COMMENT '商品ID',
+                               `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                               `star` decimal(2,1) DEFAULT '5.0' COMMENT '星级 1.0-5.0',
+                               `content` text COMMENT '评价内容',
+                               `images` text COMMENT '评价图片(JSON数组)',
+                               `audit_status` tinyint(1) DEFAULT '0' COMMENT '审核状态: 0待审核 1通过 2拒绝',
+                               `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品评价表';
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -198,15 +204,15 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_log`;
 CREATE TABLE `sys_log` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint(20) DEFAULT NULL COMMENT '操作人ID',
-  `username` varchar(64) DEFAULT NULL COMMENT '操作人用户名',
-  `role` varchar(20) DEFAULT NULL COMMENT '角色(USER/ADMIN)',
-  `module` varchar(50) DEFAULT NULL COMMENT '操作模块',
-  `action` varchar(255) DEFAULT NULL COMMENT '具体操作描述',
-  `ip_address` varchar(50) DEFAULT NULL COMMENT '操作IP',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                           `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                           `user_id` bigint(20) DEFAULT NULL COMMENT '操作人ID',
+                           `username` varchar(64) DEFAULT NULL COMMENT '操作人用户名',
+                           `role` varchar(20) DEFAULT NULL COMMENT '角色(USER/ADMIN)',
+                           `module` varchar(50) DEFAULT NULL COMMENT '操作模块',
+                           `action` varchar(255) DEFAULT NULL COMMENT '具体操作描述',
+                           `ip_address` varchar(50) DEFAULT NULL COMMENT '操作IP',
+                           `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                           PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
 
 -- ----------------------------
@@ -214,15 +220,15 @@ CREATE TABLE `sys_log` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_chat_message`;
 CREATE TABLE `sys_chat_message` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `sender_id` bigint(20) NOT NULL COMMENT '发送方ID (用户或客服)',
-  `receiver_id` bigint(20) NOT NULL COMMENT '接收方ID (客服或用户)',
-  `order_no` varchar(64) DEFAULT NULL COMMENT '关联的订单编号(可选)',
-  `content` text NOT NULL COMMENT '聊天内容/图片URL',
-  `msg_type` tinyint(1) DEFAULT '1' COMMENT '消息类型: 1文字 2图片 3系统消息',
-  `is_read` tinyint(1) DEFAULT '0' COMMENT '是否已读: 0未读 1已读',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+                                    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                    `sender_id` bigint(20) NOT NULL COMMENT '发送方ID (用户或客服)',
+                                    `receiver_id` bigint(20) NOT NULL COMMENT '接收方ID (客服或用户)',
+                                    `order_no` varchar(64) DEFAULT NULL COMMENT '关联的订单编号(可选)',
+                                    `content` text NOT NULL COMMENT '聊天内容/图片URL',
+                                    `msg_type` tinyint(1) DEFAULT '1' COMMENT '消息类型: 1文字 2图片 3系统消息',
+                                    `is_read` tinyint(1) DEFAULT '0' COMMENT '是否已读: 0未读 1已读',
+                                    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='售前/售后客服聊天表';
 
 -- ----------------------------
@@ -230,16 +236,16 @@ CREATE TABLE `sys_chat_message` (
 -- ----------------------------
 DROP TABLE IF EXISTS `oms_after_sales`;
 CREATE TABLE `oms_after_sales` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `order_no` varchar(64) NOT NULL COMMENT '关联订单号',
-  `user_id` bigint(20) NOT NULL COMMENT '申请人',
-  `reason` varchar(500) NOT NULL COMMENT '申请售后的原因/诉求',
-  `images` text COMMENT '凭证图片(JSON数组)',
-  `status` tinyint(1) DEFAULT '0' COMMENT '状态: 0待商家处理 1商家同意 2商家拒绝 3已完成 4已撤销',
-  `merchant_reply` varchar(500) DEFAULT NULL COMMENT '商家的回复/拒绝理由',
-  `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '实际退款金额',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '处理时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_after_sales_order` (`order_no`)
+                                   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                   `order_no` varchar(64) NOT NULL COMMENT '关联订单号',
+                                   `user_id` bigint(20) NOT NULL COMMENT '申请人',
+                                   `reason` varchar(500) NOT NULL COMMENT '申请售后的原因/诉求',
+                                   `images` text COMMENT '凭证图片(JSON数组)',
+                                   `status` tinyint(1) DEFAULT '0' COMMENT '状态: 0待商家处理 1商家同意 2商家拒绝 3已完成 4已撤销',
+                                   `merchant_reply` varchar(500) DEFAULT NULL COMMENT '商家的回复/拒绝理由',
+                                   `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '实际退款金额',
+                                   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '处理时间',
+                                   PRIMARY KEY (`id`),
+                                   UNIQUE KEY `uk_after_sales_order` (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='售后服务记录表';

@@ -18,11 +18,14 @@
             <result property="deliveryTime" column="delivery_time" jdbcType="TIMESTAMP"/>
             <result property="receiveTime" column="receive_time" jdbcType="TIMESTAMP"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="autoReceiveTime" column="auto_receive_time" jdbcType="TIMESTAMP"/>
+            <result property="isExtended" column="is_extended" jdbcType="TINYINT"/>
+            <result property="closeTime" column="close_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,order_no,user_id,total_amount,pay_amount,status,
         receiver_snapshot,tracking_company,tracking_no,payment_time,delivery_time,
-        receive_time,create_time
+        receive_time,create_time,auto_receive_time,is_extended,close_time
     </sql>
 </mapper>

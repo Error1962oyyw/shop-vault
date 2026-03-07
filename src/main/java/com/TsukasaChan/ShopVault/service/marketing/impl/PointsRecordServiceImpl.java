@@ -16,7 +16,3 @@ public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, Poi
     implements PointsRecordService{
 
 }
-
-
-
-

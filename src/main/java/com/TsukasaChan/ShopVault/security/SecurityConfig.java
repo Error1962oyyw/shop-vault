@@ -32,12 +32,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/login/admin",
-                                //"/images/**",
                                 "/api/product/list",
-                                //"/api/test/guest",
                                 "/error",
                                 "/api/recommendation/guess-you-like"
-                                //"/api/product/yolo-search"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

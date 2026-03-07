@@ -1,5 +1,6 @@
 package com.TsukasaChan.ShopVault.controller.order;
 
+import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.order.AfterSales;
@@ -65,6 +66,7 @@ public class AfterSalesController {
     /**
      * 3. 管理端：审核并处理售后申请
      */
+    @LogOperation(module = "售后服务", action = "处理退款申请")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/resolve")
     public Result<String> resolveAfterSales(@RequestBody ResolveDto dto) {

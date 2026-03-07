@@ -15,4 +15,8 @@ public interface OrderService extends IService<Order> {
     void shipOrder(String orderNo);
     // 确认收货 (发积分 1:100)
     void confirmReceive(String orderNo, Long userId);
+
+    void extendReceiveTime(String orderNo, Long userId);
+
+    void cancelOrder(String orderNo, Long userId);
 }

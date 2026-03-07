@@ -1,12 +1,14 @@
 package com.TsukasaChan.ShopVault.service.order.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.TsukasaChan.ShopVault.entity.marketing.Activity;
 import com.TsukasaChan.ShopVault.entity.order.CartItem;
 import com.TsukasaChan.ShopVault.entity.order.Order;
 import com.TsukasaChan.ShopVault.entity.order.OrderItem;
 import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.mapper.order.OrderMapper;
+import com.TsukasaChan.ShopVault.service.marketing.ActivityService;
 import com.TsukasaChan.ShopVault.service.order.CartItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +35,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final OrderItemService orderItemService;
     private final UserService userService;
     private final CartItemService cartItemService;
+    private final ActivityService activityService;
 
     // 校验：限制用户最多只能有 3 个未付款订单，防止恶意占库存
     private void checkUnpaidLimit(Long userId) {
@@ -46,16 +50,36 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     // 内部通用生成订单号及处理会员日逻辑的方法
     private Order buildOrder(Long userId, BigDecimal totalAmount, String orderNo) {
         BigDecimal payAmount = totalAmount;
-        boolean isMemberDay = (LocalDate.now().getDayOfMonth() % 10 == 8);
-        if (isMemberDay) {
-            payAmount = totalAmount.multiply(new BigDecimal("0.8")).setScale(2, RoundingMode.HALF_UP);
+
+        // 动态查询当前生效的促销活动 (type = 1)
+        List<Activity> activities = activityService.list(new LambdaQueryWrapper<Activity>()
+                .eq(Activity::getType, 1)
+                .eq(Activity::getStatus, 1)
+                .le(Activity::getStartTime, LocalDateTime.now())
+                .ge(Activity::getEndTime, LocalDateTime.now()));
+
+        for (Activity activity : activities) {
+            String rule = activity.getRuleExpression();
+            boolean isMatch = false;
+
+            // 规则解析：如果规则填了 "8"，代表尾号为8的日子生效；如果填了 "EVERYDAY"，每天生效
+            if (rule != null && String.valueOf(LocalDate.now().getDayOfMonth()).endsWith(rule)) {
+                isMatch = true;
+            } else if ("EVERYDAY".equalsIgnoreCase(rule)) {
+                isMatch = true;
+            }
+
+            if (isMatch && activity.getDiscountRate() != null) {
+                payAmount = payAmount.multiply(activity.getDiscountRate()).setScale(2, RoundingMode.HALF_UP);
+            }
         }
+
         Order order = new Order();
         order.setOrderNo(orderNo);
         order.setUserId(userId);
         order.setTotalAmount(totalAmount);
         order.setPayAmount(payAmount);
-        order.setStatus(0); // ★ 0: 待付款
+        order.setStatus(0); // 待付款
         return order;
     }
 
@@ -158,6 +182,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Order order = this.getOne(new LambdaQueryWrapper<Order>().eq(Order::getOrderNo, orderNo));
         if (order != null && order.getStatus() == 1) {
             order.setStatus(2); // 2: 待收货
+            order.setDeliveryTime(LocalDateTime.now());
+            order.setAutoReceiveTime(LocalDateTime.now().plusDays(10)); // 发货后默认10天自动收货
             this.updateById(order);
         }
     }
@@ -169,14 +195,76 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (order == null || order.getStatus() != 2) throw new RuntimeException("订单状态不支持确认收货");
 
         order.setStatus(3); // 3: 已完成
+        order.setReceiveTime(LocalDateTime.now());
         this.updateById(order);
 
-        // ★ 修改比例：实付款 1元 = 100积分
-        int rewardPoints = order.getPayAmount().multiply(new BigDecimal("100")).intValue();
+        // 动态查询积分翻倍活动
+        BigDecimal pointsMultiplier = new BigDecimal("1.00");
+        List<Activity> activities = activityService.list(new LambdaQueryWrapper<Activity>()
+                .eq(Activity::getType, 1).eq(Activity::getStatus, 1)
+                .le(Activity::getStartTime, LocalDateTime.now()).ge(Activity::getEndTime, LocalDateTime.now()));
+
+        for (Activity activity : activities) {
+            if (activity.getPointsMultiplier() != null && activity.getPointsMultiplier().compareTo(BigDecimal.ONE) > 0) {
+                pointsMultiplier = pointsMultiplier.max(activity.getPointsMultiplier()); // 取最大的翻倍倍率
+            }
+        }
+
+        // 实付款 1元 = 100积分 * 倍率
+        int rewardPoints = order.getPayAmount().multiply(new BigDecimal("100")).multiply(pointsMultiplier).intValue();
+
+        User user = userService.getById(userId);
         if (rewardPoints > 0) {
-            User user = userService.getById(userId);
             user.setPoints(user.getPoints() + rewardPoints);
-            userService.updateById(user);
+        }
+        // ★ 每次成功购物增加 2 点信誉分 (最高100)
+        user.setCreditScore(Math.min(100, user.getCreditScore() + 2));
+
+        userService.updateById(user);
+    }
+
+    // 新增：延长收货时间
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void extendReceiveTime(String orderNo, Long userId) {
+        Order order = this.getOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNo, orderNo).eq(Order::getUserId, userId));
+
+        if (order == null || order.getStatus() != 2) throw new RuntimeException("订单状态不支持延长收货");
+        if (order.getIsExtended() == 1) throw new RuntimeException("每笔订单只能延长一次收货时间");
+
+        User user = userService.getById(userId);
+        // 信誉分机制：低于60分不允许延长收货
+        if (user.getCreditScore() < 60) throw new RuntimeException("您的信誉分过低，无法申请延长收货");
+
+        order.setAutoReceiveTime(order.getAutoReceiveTime().plusDays(5)); // 延长5天，最多15天
+        order.setIsExtended(1);
+        this.updateById(order);
+    }
+
+    // 取消订单 (未付款时)
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrder(String orderNo, Long userId) {
+        Order order = this.getOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNo, orderNo).eq(Order::getUserId, userId));
+        if (order == null || order.getStatus() != 0) throw new RuntimeException("只能取消待付款的订单");
+
+        order.setStatus(4); // 关闭
+        order.setCloseTime(LocalDateTime.now());
+        this.updateById(order);
+
+        // 恢复库存
+        restoreInventory(order.getId());
+    }
+
+    // 内部方法：恢复库存
+    private void restoreInventory(Long orderId) {
+        List<OrderItem> items = orderItemService.list(new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderId));
+        for (OrderItem item : items) {
+            Product product = productService.getById(item.getProductId());
+            product.setStock(product.getStock() + item.getQuantity());
+            productService.updateById(product);
         }
     }
 }

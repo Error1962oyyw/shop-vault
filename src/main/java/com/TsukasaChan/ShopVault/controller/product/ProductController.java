@@ -1,5 +1,6 @@
 package com.TsukasaChan.ShopVault.controller.product;
 
+import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.product.Category;
@@ -30,6 +31,7 @@ public class ProductController {
     /**
      * 1. 发布商品 (仅限管理员)
      */
+    @LogOperation(module = "商品管理", action = "发布新商品")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/publish")
     public Result<String> publishProduct(@RequestBody Product product) {

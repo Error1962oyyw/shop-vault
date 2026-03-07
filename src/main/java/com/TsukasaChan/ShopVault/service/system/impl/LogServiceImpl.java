@@ -16,7 +16,3 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
     implements LogService{
 
 }
-
-
-
-
