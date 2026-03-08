@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +18,11 @@ import lombok.Data;
 @TableName(value ="oms_order")
 @Data
 public class Order implements Serializable {
+
+    @Serial
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
+
     /**
      * 主键ID
      */
@@ -43,7 +50,7 @@ public class Order implements Serializable {
     private BigDecimal payAmount;
 
     /**
-     * 状态: 0待付款 1待发货 2已发货 3已收货 4已关闭 5售后中
+     * 状态: 0待付款 1待发货 2待收货 3已完成(待评价) 4已关闭 5售后中
      */
     private Integer status;
 
@@ -96,7 +103,4 @@ public class Order implements Serializable {
      * 订单关闭时间
      */
     private LocalDateTime closeTime;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

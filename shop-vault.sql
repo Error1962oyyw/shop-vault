@@ -114,7 +114,7 @@ CREATE TABLE `oms_order` (
                              `user_id` bigint(20) NOT NULL COMMENT '用户ID',
                              `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额',
                              `pay_amount` decimal(10,2) NOT NULL COMMENT '实付金额 (扣除优惠后)',
-                             `status` int(2) DEFAULT '0' COMMENT '状态: 0待付款 1待发货 2已发货 3已完成 4已关闭 5售后中',
+                             `status` int(2) DEFAULT '0' COMMENT '状态: 0待付款 1待发货 2待收货 3已完成(待评价) 4已关闭 5售后中',
                              `receiver_snapshot` text COMMENT '收货人信息快照(JSON格式，防止地址修改影响旧订单)',
                              `tracking_company` varchar(64) DEFAULT NULL COMMENT '物流公司',
                              `tracking_no` varchar(64) DEFAULT NULL COMMENT '物流单号',
@@ -192,8 +192,11 @@ CREATE TABLE `pms_comment` (
                                `star` decimal(2,1) DEFAULT '5.0' COMMENT '星级 1.0-5.0',
                                `content` text COMMENT '评价内容',
                                `images` text COMMENT '评价图片(JSON数组)',
-                               `audit_status` tinyint(1) DEFAULT '0' COMMENT '审核状态: 0待审核 1通过 2拒绝',
+                               `audit_status` tinyint(1) DEFAULT '1' COMMENT '状态: 1正常展示 2被管理员删除',
                                `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               `likes` int(11) DEFAULT '0' COMMENT '点赞数',
+                               `dislikes` int(11) DEFAULT '0' COMMENT '点踩数',
+                               `is_reported` tinyint(1) DEFAULT '0' COMMENT '是否被举报: 0否 1是',
                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品评价表';
 
@@ -249,3 +252,39 @@ CREATE TABLE `oms_after_sales` (
                                    PRIMARY KEY (`id`),
                                    UNIQUE KEY `uk_after_sales_order` (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='售后服务记录表';
+
+-- 15. 新增：商品收藏表
+DROP TABLE IF EXISTS `pms_favorite`;
+CREATE TABLE `pms_favorite` (
+                                `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                                `product_id` bigint(20) NOT NULL COMMENT '商品ID',
+                                `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                PRIMARY KEY (`id`),
+                                UNIQUE KEY `uk_user_product` (`user_id`, `product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户商品收藏表';
+
+-- 16. 新增：用户行为轨迹表 (为后续完善的协同过滤算法提供数据支持)
+DROP TABLE IF EXISTS `sys_user_behavior`;
+CREATE TABLE `sys_user_behavior` (
+                                     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                     `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                                     `product_id` bigint(20) NOT NULL COMMENT '商品ID',
+                                     `behavior_type` tinyint(1) NOT NULL COMMENT '行为: 1点击 2收藏 3加购物车 4购买',
+                                     `weight` int(11) NOT NULL COMMENT '权重分值 (如点击1分，购买5分)',
+                                     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                     PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户行为轨迹表';
+
+-- 17. 用户优惠券/福利领取表 (sms_user_coupon)
+DROP TABLE IF EXISTS `sms_user_coupon`;
+CREATE TABLE `sms_user_coupon` (
+                                   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+                                   `activity_id` bigint(20) NOT NULL COMMENT '关联的活动ID(即优惠券模板)',
+                                   `status` tinyint(1) DEFAULT '0' COMMENT '状态: 0未使用 1已使用 2已过期',
+                                   `get_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '领取时间',
+                                   `use_time` datetime DEFAULT NULL COMMENT '使用时间',
+                                   `expire_time` datetime NOT NULL COMMENT '过期时间',
+                                   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户优惠券领取记录表';

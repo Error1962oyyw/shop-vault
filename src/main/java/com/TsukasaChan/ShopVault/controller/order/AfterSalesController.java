@@ -33,6 +33,7 @@ public class AfterSalesController {
     /**
      * 1. 用户端：申请售后
      */
+    @LogOperation(module = "售后服务", action = "用户提交售后申请")
     @PostMapping("/apply")
     public Result<String> applyAfterSales(@RequestBody AfterSales afterSales) {
         if (afterSales.getOrderNo() == null || afterSales.getReason() == null) {
@@ -66,7 +67,7 @@ public class AfterSalesController {
     /**
      * 3. 管理端：审核并处理售后申请
      */
-    @LogOperation(module = "售后服务", action = "处理退款申请")
+    @LogOperation(module = "售后服务", action = "商家审核退款")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/resolve")
     public Result<String> resolveAfterSales(@RequestBody ResolveDto dto) {

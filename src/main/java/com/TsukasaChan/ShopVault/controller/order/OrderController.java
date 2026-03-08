@@ -1,5 +1,6 @@
 package com.TsukasaChan.ShopVault.controller.order;
 
+import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.system.User;
@@ -32,6 +33,7 @@ public class OrderController {
     }
 
     // 1. 立即购买 (详情页)
+    @LogOperation(module = "订单交易", action = "直接下单购买")
     @PostMapping("/buy-now")
     public Result<String> buyNow(@RequestBody BuyNowDto dto) {
         String orderNo = orderService.buyNow(getCurrentUserId(), dto.getProductId(), dto.getQuantity());
@@ -39,6 +41,7 @@ public class OrderController {
     }
 
     // 2. 购物车结算
+    @LogOperation(module = "订单交易", action = "购物车批量结算")
     @PostMapping("/cart-checkout")
     public Result<String> cartCheckout(@RequestBody List<Long> cartItemIds) {
         String orderNo = orderService.cartCheckout(getCurrentUserId(), cartItemIds);
@@ -53,6 +56,7 @@ public class OrderController {
     }
 
     // 4. 模拟商家发货 (状态 1 -> 2) - 仅限管理员
+    @LogOperation(module = "订单管理", action = "商家发货")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/ship/{orderNo}")
     public Result<String> shipOrder(@PathVariable String orderNo) {
@@ -65,5 +69,24 @@ public class OrderController {
     public Result<String> receiveOrder(@PathVariable String orderNo) {
         orderService.confirmReceive(orderNo, getCurrentUserId());
         return Result.success("收货成功，100倍积分已到账！");
+    }
+
+    /**
+     * 延长收货时间
+     */
+    @PostMapping("/extend/{orderNo}")
+    public Result<String> extendReceiveTime(@PathVariable String orderNo) {
+        orderService.extendReceiveTime(orderNo, getCurrentUserId());
+        return Result.success("已成功延长收货时间5天");
+    }
+
+    /**
+     * 取消未付款的订单
+     */
+    @LogOperation(module = "订单交易", action = "用户取消未付款订单")
+    @PostMapping("/cancel/{orderNo}")
+    public Result<String> cancelOrder(@PathVariable String orderNo) {
+        orderService.cancelOrder(orderNo, getCurrentUserId());
+        return Result.success("订单已取消");
     }
 }

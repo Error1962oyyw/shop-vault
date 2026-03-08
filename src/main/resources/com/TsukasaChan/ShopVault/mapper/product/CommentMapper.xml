@@ -9,15 +9,19 @@
             <result property="orderId" column="order_id" jdbcType="BIGINT"/>
             <result property="productId" column="product_id" jdbcType="BIGINT"/>
             <result property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="star" column="star" jdbcType="INTEGER"/>
+            <result property="star" column="star" jdbcType="DECIMAL"/>
             <result property="content" column="content" jdbcType="VARCHAR"/>
             <result property="images" column="images" jdbcType="VARCHAR"/>
             <result property="auditStatus" column="audit_status" jdbcType="TINYINT"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="likes" column="likes" jdbcType="INTEGER"/>
+            <result property="dislikes" column="dislikes" jdbcType="INTEGER"/>
+            <result property="isReported" column="is_reported" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,order_id,product_id,user_id,star,content,
-        images,audit_status,create_time
+        images,audit_status,create_time,likes,dislikes,
+        is_reported
     </sql>
 </mapper>

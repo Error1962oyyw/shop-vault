@@ -1,5 +1,6 @@
 package com.TsukasaChan.ShopVault.controller.system;
 
+import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.system.User;
@@ -37,6 +38,7 @@ public class UserController {
     /**
      * 2. 修改个人资料 (头像、昵称、邮箱等)
      */
+    @LogOperation(module = "个人中心", action = "修改个人资料")
     @PutMapping("/profile")
     public Result<String> updateProfile(@RequestBody User updateInfo) {
         User user = getCurrentUser();
@@ -59,6 +61,7 @@ public class UserController {
     /**
      * 3. 修改密码
      */
+    @LogOperation(module = "个人中心", action = "修改密码")
     @PutMapping("/password")
     public Result<String> updatePassword(@RequestBody PasswordUpdateDto dto) {
         User user = getCurrentUser();

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     /**
-     * ★ 新增：专门拦截 Spring Security 的“权限不足”异常
+     * 专门拦截 Spring Security 的“权限不足”异常
      */
     @ExceptionHandler({AuthorizationDeniedException.class, org.springframework.security.access.AccessDeniedException.class})
     public Result<String> handleAccessDeniedException(Exception e) {

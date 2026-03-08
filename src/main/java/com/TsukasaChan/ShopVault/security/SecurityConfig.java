@@ -21,8 +21,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
-    // 注意：我们连 UserDetailsService 和 PasswordEncoder 都不用在这里注入了，
-    // Spring Boot 底层会自动发现它们！
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/login",
-                                "/api/auth/login/admin",
+                                "/api/auth/admin/login",
                                 "/api/product/list",
                                 "/error",
                                 "/api/recommendation/guess-you-like"
@@ -41,17 +39,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // ★ 我们删除了 .authenticationProvider(...) 这行代码，让 Spring 自己去组装
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // 只保留这一个 Bean 即可，因为 AuthController 的登录接口里需要调用它来认证
+    // AuthController 的登录接口里需要调用 Bean 来认证
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // ★ 我们彻底删除了 authenticationProvider() 方法！
 }

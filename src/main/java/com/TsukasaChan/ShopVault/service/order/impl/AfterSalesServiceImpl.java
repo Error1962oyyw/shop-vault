@@ -2,8 +2,6 @@ package com.TsukasaChan.ShopVault.service.order.impl;
 
 import com.TsukasaChan.ShopVault.entity.order.AfterSales;
 import com.TsukasaChan.ShopVault.entity.order.Order;
-import com.TsukasaChan.ShopVault.entity.order.OrderItem;
-import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.mapper.order.AfterSalesMapper;
 import com.TsukasaChan.ShopVault.service.order.AfterSalesService;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +26,6 @@ public class AfterSalesServiceImpl extends ServiceImpl<AfterSalesMapper, AfterSa
     private final OrderService orderService;
     private final UserService userService;
     private final OrderItemService orderItemService; // 用于查明细恢复库存
-    private final ProductService productService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -51,7 +47,7 @@ public class AfterSalesServiceImpl extends ServiceImpl<AfterSalesMapper, AfterSa
 
         User user = userService.getById(userId);
 
-        // ★ 信誉分特权：如果处于【待发货】状态，且信誉分 >= 90，触发极速退款，无需商家审批！
+        // 信誉分特权：如果处于【待发货】状态，且信誉分 >= 90，触发极速退款，无需商家审批！
         if (order.getStatus() == 1 && user.getCreditScore() >= 90) {
             afterSales.setStatus(3); // 售后直接完成
             afterSales.setMerchantReply("信誉极好，系统自动秒退款");
@@ -62,7 +58,7 @@ public class AfterSalesServiceImpl extends ServiceImpl<AfterSalesMapper, AfterSa
             orderService.updateById(order);
 
             // 恢复库存
-            restoreInventory(order.getId());
+            orderItemService.restoreInventoryByOrderId(order.getId());
             return;
         }
 
@@ -105,7 +101,7 @@ public class AfterSalesServiceImpl extends ServiceImpl<AfterSalesMapper, AfterSa
             }
 
             // 恢复库存
-            restoreInventory(order.getId());
+            orderItemService.restoreInventoryByOrderId(order.getId());
 
         } else {
             afterSales.setStatus(2); // 拒绝
@@ -119,15 +115,5 @@ public class AfterSalesServiceImpl extends ServiceImpl<AfterSalesMapper, AfterSa
         userService.updateById(user);
         this.updateById(afterSales);
         orderService.updateById(order);
-    }
-
-    // 内部方法：恢复库存
-    private void restoreInventory(Long orderId) {
-        List<OrderItem> items = orderItemService.list(new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderId));
-        for (OrderItem item : items) {
-            Product product = productService.getById(item.getProductId());
-            product.setStock(product.getStock() + item.getQuantity());
-            productService.updateById(product);
-        }
     }
 }

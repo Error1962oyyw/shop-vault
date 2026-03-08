@@ -1,5 +1,6 @@
 package com.TsukasaChan.ShopVault.controller.system;
 
+import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.system.User;
@@ -27,6 +28,7 @@ public class AddressController {
     /**
      * 1. 添加地址
      */
+    @LogOperation(module = "收货地址", action = "新增收货地址")
     @PostMapping("/add")
     public Result<String> addAddress(@RequestBody Address address) {
         Long userId = getCurrentUserId();

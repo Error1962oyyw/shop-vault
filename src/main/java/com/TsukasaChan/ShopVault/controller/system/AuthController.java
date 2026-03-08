@@ -1,5 +1,6 @@
 package com.TsukasaChan.ShopVault.controller.system;
 
+import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.LoginDto;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.entity.system.User;
@@ -23,6 +24,7 @@ public class AuthController {
     /**
      * 1. 移动端/商城前台登录 (普通用户)
      */
+    @LogOperation(module = "系统安全", action = "用户前台登录")
     @PostMapping("/login")
     public Result<String> userLogin(@RequestBody LoginDto loginDto) {
         Authentication auth = authenticationManager.authenticate(
@@ -41,7 +43,8 @@ public class AuthController {
     /**
      * 2. 后台管理系统登录 (仅限管理员)
      */
-    @PostMapping("/login/admin")
+    @LogOperation(module = "系统安全", action = "管理员后台登录")
+    @PostMapping("/admin/login")
     public Result<String> adminLogin(@RequestBody LoginDto loginDto) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
@@ -57,6 +60,7 @@ public class AuthController {
     }
 
     // 注册接口保持不变
+    @LogOperation(module = "系统安全", action = "新用户注册")
     @PostMapping("/register")
     public Result<String> register(@RequestBody User user) {
         userService.register(user);

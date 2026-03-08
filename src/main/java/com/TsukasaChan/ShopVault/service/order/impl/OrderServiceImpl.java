@@ -2,6 +2,7 @@ package com.TsukasaChan.ShopVault.service.order.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.TsukasaChan.ShopVault.entity.marketing.Activity;
+import com.TsukasaChan.ShopVault.entity.marketing.UserCoupon;
 import com.TsukasaChan.ShopVault.entity.order.CartItem;
 import com.TsukasaChan.ShopVault.entity.order.Order;
 import com.TsukasaChan.ShopVault.entity.order.OrderItem;
@@ -9,6 +10,7 @@ import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.mapper.order.OrderMapper;
 import com.TsukasaChan.ShopVault.service.marketing.ActivityService;
+import com.TsukasaChan.ShopVault.service.marketing.UserCouponService;
 import com.TsukasaChan.ShopVault.service.order.CartItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
@@ -36,6 +38,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final UserService userService;
     private final CartItemService cartItemService;
     private final ActivityService activityService;
+    private final UserCouponService userCouponService;
 
     // 校验：限制用户最多只能有 3 个未付款订单，防止恶意占库存
     private void checkUnpaidLimit(Long userId) {
@@ -48,8 +51,33 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     // 内部通用生成订单号及处理会员日逻辑的方法
-    private Order buildOrder(Long userId, BigDecimal totalAmount, String orderNo) {
+    private Order buildOrder(Long userId, BigDecimal totalAmount, String orderNo, Long userCouponId) {
         BigDecimal payAmount = totalAmount;
+
+        // 1. 处理优惠券抵扣 (如果有传 userCouponId)
+        if (userCouponId != null) {
+            UserCoupon userCoupon = userCouponService.getById(userCouponId);
+            // 校验券是否合法、是否属于该用户、是否未使用、是否过期
+            if (userCoupon != null
+                    && userCoupon.getUserId().equals(userId)
+                    && userCoupon.getStatus() == 0
+                    && userCoupon.getExpireTime().isAfter(LocalDateTime.now())) {
+
+                Activity couponRule = activityService.getById(userCoupon.getActivityId());
+                // 假设 discountRate 存的是折扣率 (如 0.8 代表打8折) 或直接抵扣的金额
+                // 这里我们演示打折模式：
+                if (couponRule != null && couponRule.getDiscountRate() != null) {
+                    payAmount = payAmount.multiply(couponRule.getDiscountRate()).setScale(2, RoundingMode.HALF_UP);
+
+                    // 将优惠券标记为已使用
+                    userCoupon.setStatus(1);
+                    userCoupon.setUseTime(LocalDateTime.now());
+                    userCouponService.updateById(userCoupon);
+                }
+            } else {
+                throw new RuntimeException("该优惠券无效或已过期");
+            }
+        }
 
         // 动态查询当前生效的促销活动 (type = 1)
         List<Activity> activities = activityService.list(new LambdaQueryWrapper<Activity>()
@@ -77,8 +105,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Order order = new Order();
         order.setOrderNo(orderNo);
         order.setUserId(userId);
-        order.setTotalAmount(totalAmount);
-        order.setPayAmount(payAmount);
+        order.setTotalAmount(totalAmount); // 商品原总价
+        order.setPayAmount(payAmount);     // 扣除优惠券和折扣后的实付价
         order.setStatus(0); // 待付款
         return order;
     }
@@ -154,7 +182,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         orderItemService.saveBatch(orderItems);
 
-        // ★ 核心逻辑：结算后清空对应的购物车商品
+        // 结算后清空对应的购物车商品
         cartItemService.removeByIds(cartItemIds);
 
         return orderNo;
@@ -217,7 +245,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (rewardPoints > 0) {
             user.setPoints(user.getPoints() + rewardPoints);
         }
-        // ★ 每次成功购物增加 2 点信誉分 (最高100)
+        // 每次成功购物增加 2 点信誉分 (最高100)
         user.setCreditScore(Math.min(100, user.getCreditScore() + 2));
 
         userService.updateById(user);
@@ -255,16 +283,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         this.updateById(order);
 
         // 恢复库存
-        restoreInventory(order.getId());
-    }
-
-    // 内部方法：恢复库存
-    private void restoreInventory(Long orderId) {
-        List<OrderItem> items = orderItemService.list(new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderId));
-        for (OrderItem item : items) {
-            Product product = productService.getById(item.getProductId());
-            product.setStock(product.getStock() + item.getQuantity());
-            productService.updateById(product);
-        }
+        orderItemService.restoreInventoryByOrderId(order.getId());
     }
 }

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +18,11 @@ import lombok.Data;
 @TableName(value ="sms_activity")
 @Data
 public class Activity implements Serializable {
+
+    @Serial
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
+
     /**
      * 主键ID
      */
@@ -71,7 +78,4 @@ public class Activity implements Serializable {
      * 积分获取倍率(如 2.0 代表双倍积分)
      */
     private BigDecimal pointsMultiplier;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

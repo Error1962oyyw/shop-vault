@@ -33,7 +33,6 @@ public class ChatMessageController {
     }
 
     /**
-     * ★ 终极去重公共方法：获取记录并自动处理已读状态，直接返回 Result
      * @param myId 当前请求人的ID
      * @param peerId 对方的ID
      * @param unreadSenderId 需要被标记为已读的消息的发送人ID

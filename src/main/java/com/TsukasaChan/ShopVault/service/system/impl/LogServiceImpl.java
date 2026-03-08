@@ -6,11 +6,6 @@ import com.TsukasaChan.ShopVault.service.system.LogService;
 import com.TsukasaChan.ShopVault.mapper.system.LogMapper;
 import org.springframework.stereotype.Service;
 
-/**
-* @author Error1962
-* @description 针对表【sys_log(操作日志表)】的数据库操作Service实现
-* @createDate 2026-03-04 23:54:52
-*/
 @Service
 public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
     implements LogService{
