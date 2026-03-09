@@ -11,7 +11,3 @@ public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCou
     implements UserCouponService{
 
 }
-
-
-
-

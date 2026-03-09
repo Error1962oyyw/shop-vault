@@ -30,21 +30,28 @@ public class OrderController {
     public static class BuyNowDto {
         private Long productId;
         private Integer quantity;
+        private Long userCouponId; // 优惠券ID，允许为null
+    }
+
+    @Data
+    public static class CartCheckoutDto {
+        private List<Long> cartItemIds;
+        private Long userCouponId; // 优惠券ID，允许为null
     }
 
     // 1. 立即购买 (详情页)
     @LogOperation(module = "订单交易", action = "直接下单购买")
     @PostMapping("/buy-now")
     public Result<String> buyNow(@RequestBody BuyNowDto dto) {
-        String orderNo = orderService.buyNow(getCurrentUserId(), dto.getProductId(), dto.getQuantity());
+        String orderNo = orderService.buyNow(getCurrentUserId(), dto.getProductId(), dto.getQuantity(), dto.getUserCouponId());
         return Result.success("下单成功！单号：" + orderNo);
     }
 
     // 2. 购物车结算
     @LogOperation(module = "订单交易", action = "购物车批量结算")
     @PostMapping("/cart-checkout")
-    public Result<String> cartCheckout(@RequestBody List<Long> cartItemIds) {
-        String orderNo = orderService.cartCheckout(getCurrentUserId(), cartItemIds);
+    public Result<String> cartCheckout(@RequestBody CartCheckoutDto dto) {
+        String orderNo = orderService.cartCheckout(getCurrentUserId(), dto.getCartItemIds(), dto.getUserCouponId());
         return Result.success("购物车结算成功！单号：" + orderNo);
     }
 

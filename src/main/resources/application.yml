@@ -28,6 +28,20 @@ spring:
       max-file-size: 10MB
       max-request-size: 50MB
 
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: ***REMOVED***    # 替换为你的真实 QQ 邮箱
+    password: ***REMOVED***          # 授权码
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true      # QQ 邮箱要求使用 SSL
+          auth: true
+
+
 # 4.MyBatis Plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml # MapperXML扫描路径
@@ -35,6 +49,7 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启SQL打印，方便调试
     map-underscore-to-camel-case: true # 开启下划线转驼峰
+
 
 # 5.自定义配置(供代码读取)
 shop-vault:
@@ -46,6 +61,7 @@ shop-vault:
     url: http://localhost:5000/predict # Python YOLO服务的地址
   upload:
     path: D:/shop-vault/uploads/ # 本地文件存储路径
+
 
 # 6. 日志级别
 logging:

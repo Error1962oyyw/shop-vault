@@ -7,7 +7,6 @@ import com.TsukasaChan.ShopVault.mapper.order.AfterSalesMapper;
 import com.TsukasaChan.ShopVault.service.order.AfterSalesService;
 import com.TsukasaChan.ShopVault.service.order.OrderItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
-import com.TsukasaChan.ShopVault.service.product.ProductService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

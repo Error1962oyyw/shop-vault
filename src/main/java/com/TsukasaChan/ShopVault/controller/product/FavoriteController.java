@@ -6,6 +6,7 @@ import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.product.Favorite;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.product.FavoriteService;
+import com.TsukasaChan.ShopVault.service.system.UserBehaviorService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
     private final UserService userService;
+    private final UserBehaviorService userBehaviorService;
 
     private Long getCurrentUserId() {
         return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
@@ -49,7 +51,7 @@ public class FavoriteController {
             favorite.setProductId(productId);
             favoriteService.save(favorite);
 
-            // TODO: (剧透) 在第3期中，我们可以在这里调用行为追踪记录，为协同过滤算法提供权重分！
+            userBehaviorService.recordBehavior(userId, productId, 2);
 
             return Result.success("收藏成功");
         }

@@ -15,6 +15,7 @@ import com.TsukasaChan.ShopVault.service.order.CartItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderItemService;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
 import com.TsukasaChan.ShopVault.service.product.ProductService;
+import com.TsukasaChan.ShopVault.service.system.UserBehaviorService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,6 +40,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final CartItemService cartItemService;
     private final ActivityService activityService;
     private final UserCouponService userCouponService;
+    private final UserBehaviorService userBehaviorService;
 
     // 校验：限制用户最多只能有 3 个未付款订单，防止恶意占库存
     private void checkUnpaidLimit(Long userId) {
@@ -113,7 +115,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String buyNow(Long userId, Long productId, Integer quantity) {
+    public String buyNow(Long userId, Long productId, Integer quantity, Long userCouponId) {
         checkUnpaidLimit(userId);
         String orderNo = IdUtil.getSnowflakeNextIdStr();
 
@@ -134,18 +136,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         item.setProductPrice(product.getPrice());
         item.setQuantity(quantity);
 
-        Order order = buildOrder(userId, totalAmount, orderNo);
+        Order order = buildOrder(userId, totalAmount, orderNo, userCouponId);
         this.save(order);
 
         item.setOrderId(order.getId());
         orderItemService.save(item);
+
+        // ★ 解决问题4：记录购买行为 (4代表购买)
+        userBehaviorService.recordBehavior(userId, productId, 4);
 
         return orderNo;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String cartCheckout(Long userId, List<Long> cartItemIds) {
+    public String cartCheckout(Long userId, List<Long> cartItemIds, Long userCouponId) {
         checkUnpaidLimit(userId);
         if (cartItemIds == null || cartItemIds.isEmpty()) throw new RuntimeException("未选择商品");
 
@@ -172,9 +177,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             item.setProductPrice(product.getPrice());
             item.setQuantity(cartItem.getQuantity());
             orderItems.add(item);
+
+            userBehaviorService.recordBehavior(userId, product.getId(), 4);
         }
 
-        Order order = buildOrder(userId, totalAmount, orderNo);
+        Order order = buildOrder(userId, totalAmount, orderNo, userCouponId);
         this.save(order);
 
         for (OrderItem item : orderItems) {

@@ -2,11 +2,15 @@ package com.TsukasaChan.ShopVault.controller.product;
 
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
+import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.product.Category;
+import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.product.CategoryService;
 import com.TsukasaChan.ShopVault.service.product.ProductService;
 import com.TsukasaChan.ShopVault.integration.YoloClientService;
+import com.TsukasaChan.ShopVault.service.system.UserBehaviorService;
+import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.TsukasaChan.ShopVault.service.system.YoloMappingService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +31,8 @@ public class ProductController {
     private final YoloClientService yoloClientService;
     private final YoloMappingService yoloMappingService;
     private final CategoryService categoryService;
+    private final UserBehaviorService userBehaviorService;
+    private final UserService userService; // 用于获取当前用户
 
     /**
      * 1. 发布商品 (仅限管理员)
@@ -101,5 +107,27 @@ public class ProductController {
 
         // 4. 返回分类列表给前端，让用户做选择
         return Result.success(categories);
+    }
+
+    /**
+     * 获取商品详情 (游客可看，但如果登录了就记录行为)
+     */
+    @GetMapping("/detail/{id}")
+    public Result<Product> getProductDetail(@PathVariable Long id) {
+        Product product = productService.getById(id);
+        if (product == null || product.getStatus() == 0) {
+            return Result.error(404, "商品不存在或已下架");
+        }
+
+        // 尝试获取当前登录用户，如果登录了就记录“点击”行为
+        String username = SecurityUtils.getCurrentUsername();
+        if (username != null && !username.equals("anonymousUser")) {
+            User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
+            if (user != null) {
+                // ★ 记录点击浏览行为 (1代表点击)
+                userBehaviorService.recordBehavior(user.getId(), id, 1);
+            }
+        }
+        return Result.success(product);
     }
 }

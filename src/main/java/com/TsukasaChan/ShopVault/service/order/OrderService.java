@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface OrderService extends IService<Order> {
     // 立即购买 (单商品)
-    String buyNow(Long userId, Long productId, Integer quantity);
+    String buyNow(Long userId, Long productId, Integer quantity, Long userCouponId);
     // 购物车结算 (多商品)
-    String cartCheckout(Long userId, List<Long> cartItemIds);
+    String cartCheckout(Long userId, List<Long> cartItemIds, Long userCouponId);
     // 模拟付款
     void payOrder(String orderNo, Long userId);
     // 模拟商家发货

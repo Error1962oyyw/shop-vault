@@ -11,7 +11,3 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite>
     implements FavoriteService{
 
 }
-
-
-
-
