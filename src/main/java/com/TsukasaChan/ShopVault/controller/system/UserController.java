@@ -6,6 +6,7 @@ import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,12 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder; // 用于密码加密和校验
+
+    @Data
+    public static class PasswordUpdateDto {
+        private String oldPassword;
+        private String newPassword;
+    }
 
     // 获取当前登录用户
     private User getCurrentUser() {

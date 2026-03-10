@@ -1,7 +1,6 @@
-package com.TsukasaChan.ShopVault.service.system.impl;
+package com.TsukasaChan.ShopVault.infrastructure;
 
 import cn.hutool.core.util.RandomUtil;
-import com.TsukasaChan.ShopVault.service.system.VerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VerificationServiceImpl implements VerificationService {
+public class VerificationService {
 
     private final StringRedisTemplate redisTemplate;
     private final JavaMailSender mailSender;
@@ -26,7 +25,6 @@ public class VerificationServiceImpl implements VerificationService {
     private static final String CODE_PREFIX = "verify:code:";
     private static final String LOCK_PREFIX = "verify:lock:"; // 用于防刷限流
 
-    @Override
     public void sendVerificationCode(String email) {
         // 1. 检查是否在 60 秒冷却期内 (防刷机制)
         if (Boolean.TRUE.equals(redisTemplate.hasKey(LOCK_PREFIX + email))) {
@@ -61,7 +59,6 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    @Override
     public boolean verifyCode(String email, String inputCode) {
         String savedCode = redisTemplate.opsForValue().get(CODE_PREFIX + email);
         if (savedCode != null && savedCode.equals(inputCode)) {

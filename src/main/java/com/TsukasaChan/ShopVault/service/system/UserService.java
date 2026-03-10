@@ -4,5 +4,5 @@ import com.TsukasaChan.ShopVault.entity.system.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface UserService extends IService<User> {
-    void register(User user);
+    void registerWithEmail(String email, String password);
 }

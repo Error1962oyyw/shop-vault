@@ -21,8 +21,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserService userService;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        // 修改查询逻辑：传入的 identifier 可能是自动生成的 username，也可能是用户的 email
+        User user = userService.getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, identifier)
+                .or()
+                .eq(User::getEmail, identifier)); // ★ 增加支持邮箱匹配
+
         if (user == null) {
             throw new UsernameNotFoundException("用户不存在");
         }

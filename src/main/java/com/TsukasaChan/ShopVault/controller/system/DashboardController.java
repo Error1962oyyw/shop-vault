@@ -1,7 +1,7 @@
 package com.TsukasaChan.ShopVault.controller.system;
 
 import com.TsukasaChan.ShopVault.common.Result;
-import com.TsukasaChan.ShopVault.service.system.impl.DashboardServiceImpl;
+import com.TsukasaChan.ShopVault.manager.DashboardManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DashboardController {
 
-    private final DashboardServiceImpl dashboardService;
+    private final DashboardManager dashboardService;
 
     /**
      * 获取后台大屏统计数据 (仅限管理员)
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stats")
-    public Result<DashboardServiceImpl.DashboardStatDto> getStats() {
+    public Result<DashboardManager.DashboardStatDto> getStats() {
         return Result.success(dashboardService.getDashboardStats());
     }
 }

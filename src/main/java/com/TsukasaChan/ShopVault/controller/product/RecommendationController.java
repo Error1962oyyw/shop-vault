@@ -4,7 +4,7 @@ import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.product.Product;
 import com.TsukasaChan.ShopVault.entity.system.User;
-import com.TsukasaChan.ShopVault.service.product.impl.RecommendationServiceImpl;
+import com.TsukasaChan.ShopVault.manager.RecommendationEngine;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationController {
 
-    private final RecommendationServiceImpl recommendationService;
+    private final RecommendationEngine recommendationService;
     private final UserService userService;
 
     @GetMapping("/guess-you-like")

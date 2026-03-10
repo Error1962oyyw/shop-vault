@@ -1,4 +1,4 @@
-package com.TsukasaChan.ShopVault.service.system.impl;
+package com.TsukasaChan.ShopVault.manager;
 
 import com.TsukasaChan.ShopVault.entity.order.Order;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class DashboardServiceImpl {
+public class DashboardManager {
 
     private final UserService userService;
     private final ProductService productService;

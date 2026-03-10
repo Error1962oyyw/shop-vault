@@ -1,4 +1,4 @@
-package com.TsukasaChan.ShopVault.service.product.impl;
+package com.TsukasaChan.ShopVault.manager;
 
 import com.TsukasaChan.ShopVault.entity.order.Order;
 import com.TsukasaChan.ShopVault.entity.order.OrderItem;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RecommendationServiceImpl {
+public class RecommendationEngine {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;

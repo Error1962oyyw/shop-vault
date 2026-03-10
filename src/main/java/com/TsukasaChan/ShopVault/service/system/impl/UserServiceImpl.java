@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 
 @Service
@@ -16,23 +18,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final PasswordEncoder passwordEncoder;
 
-    // 自定义注册方法
-    public void register(User user) {
-        // 1. 检查用户名是否已存在
-        long count = this.count(new LambdaQueryWrapper<User>().eq(User::getUsername, user.getUsername()));
+    // 新增基于邮箱的注册方法
+    @Transactional(rollbackFor = Exception.class)
+    public void registerWithEmail(String email, String password) {
+        long count = this.count(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
         if (count > 0) {
-            throw new RuntimeException("用户名已存在");
+            throw new RuntimeException("该邮箱已被注册");
         }
 
-        // 2. 密码加密
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        // ★ 系统自动生成全局唯一的 username (例如: sv_user_12345678)
+        user.setUsername("sv_user_" + cn.hutool.core.util.RandomUtil.randomNumbers(8));
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
 
-        // 3. 设置默认值 (数据库没有默认值的话，代码里设置最稳妥)
-        user.setRole("USER"); // 默认注册为普通用户
+        // 生成一个默认昵称
+        user.setNickname("小铺用户_" + cn.hutool.core.util.RandomUtil.randomString(4));
+        user.setRole("USER");
         user.setPoints(0);
         user.setBalance(new BigDecimal("0.00"));
+        user.setCreditScore(100); // 初始信誉分
 
-        // 4. 保存到数据库
         this.save(user);
     }
 }
