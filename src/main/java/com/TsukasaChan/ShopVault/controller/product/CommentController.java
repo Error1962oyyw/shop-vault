@@ -49,11 +49,7 @@ public class CommentController {
      */
     @PostMapping("/like/{commentId}")
     public Result<String> likeComment(@PathVariable Long commentId) {
-        Comment comment = commentService.getById(commentId);
-        if (comment != null) {
-            comment.setLikes(comment.getLikes() + 1);
-            commentService.updateById(comment);
-        }
+        commentService.likeComment(commentId);
         return Result.success("点赞成功");
     }
 
@@ -62,11 +58,7 @@ public class CommentController {
      */
     @PostMapping("/report/{commentId}")
     public Result<String> reportComment(@PathVariable Long commentId) {
-        Comment comment = commentService.getById(commentId);
-        if (comment != null) {
-            comment.setIsReported(1);
-            commentService.updateById(comment);
-        }
+        commentService.reportComment(commentId);
         return Result.success("已收到您的举报，我们将尽快处理");
     }
 
@@ -76,11 +68,7 @@ public class CommentController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/admin/delete/{commentId}")
     public Result<String> deleteComment(@PathVariable Long commentId) {
-        Comment comment = commentService.getById(commentId);
-        if (comment != null) {
-            comment.setAuditStatus(2); // 标记为被管理员删除
-            commentService.updateById(comment);
-        }
+        commentService.adminDeleteComment(commentId);
         return Result.success("已删除该违规评价");
     }
 }

@@ -3,16 +3,15 @@ package com.TsukasaChan.ShopVault.controller.order;
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.dto.BuyNowDto;
+import com.TsukasaChan.ShopVault.dto.CartCheckoutDto;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/order")
@@ -24,19 +23,6 @@ public class OrderController {
 
     private Long getCurrentUserId() {
         return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
-    }
-
-    @Data
-    public static class BuyNowDto {
-        private Long productId;
-        private Integer quantity;
-        private Long userCouponId; // 优惠券ID，允许为null
-    }
-
-    @Data
-    public static class CartCheckoutDto {
-        private List<Long> cartItemIds;
-        private Long userCouponId; // 优惠券ID，允许为null
     }
 
     // 1. 立即购买 (详情页)

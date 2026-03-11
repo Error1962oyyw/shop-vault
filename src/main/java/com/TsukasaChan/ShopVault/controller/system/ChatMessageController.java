@@ -7,7 +7,6 @@ import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.system.ChatMessageService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,19 +38,7 @@ public class ChatMessageController {
      * @param unreadReceiverId 需要被标记为已读的消息的接收人ID
      */
     private Result<List<ChatMessage>> fetchHistoryAndMarkRead(Long myId, Long peerId, Long unreadSenderId, Long unreadReceiverId) {
-        // 1. 获取聊天记录
-        List<ChatMessage> history = chatMessageService.list(new LambdaQueryWrapper<ChatMessage>()
-                .and(wrapper -> wrapper.eq(ChatMessage::getSenderId, myId).eq(ChatMessage::getReceiverId, peerId)
-                        .or()
-                        .eq(ChatMessage::getSenderId, peerId).eq(ChatMessage::getReceiverId, myId))
-                .orderByAsc(ChatMessage::getCreateTime));
-
-        // 2. 将对方发给我的未读消息标记为已读
-        chatMessageService.update(new LambdaUpdateWrapper<ChatMessage>()
-                .eq(ChatMessage::getSenderId, unreadSenderId)
-                .eq(ChatMessage::getReceiverId, unreadReceiverId)
-                .eq(ChatMessage::getIsRead, 0)
-                .set(ChatMessage::getIsRead, 1));
+        List<ChatMessage> history = chatMessageService.fetchHistoryAndMarkRead(myId, peerId, unreadSenderId, unreadReceiverId);
 
         // 3. 直接组装返回结果
         return Result.success(history);

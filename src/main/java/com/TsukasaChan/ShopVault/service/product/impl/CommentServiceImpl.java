@@ -45,4 +45,31 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         comment.setAuditStatus(0);
         this.save(comment);
     }
+
+    @Override
+    public void likeComment(Long commentId) {
+        Comment comment = this.getById(commentId);
+        if (comment != null) {
+            comment.setLikes(comment.getLikes() + 1);
+            this.updateById(comment);
+        }
+    }
+
+    @Override
+    public void reportComment(Long commentId) {
+        Comment comment = this.getById(commentId);
+        if (comment != null) {
+            comment.setIsReported(1);
+            this.updateById(comment);
+        }
+    }
+
+    @Override
+    public void adminDeleteComment(Long commentId) {
+        Comment comment = this.getById(commentId);
+        if (comment != null) {
+            comment.setAuditStatus(2);
+            this.updateById(comment);
+        }
+    }
 }

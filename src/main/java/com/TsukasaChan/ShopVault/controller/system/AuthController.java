@@ -2,12 +2,14 @@ package com.TsukasaChan.ShopVault.controller.system;
 
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
+import com.TsukasaChan.ShopVault.dto.EmailLoginDto;
+import com.TsukasaChan.ShopVault.dto.EmailRegisterDto;
+import com.TsukasaChan.ShopVault.dto.ResetPasswordDto;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.infrastructure.VerificationService;
 import com.TsukasaChan.ShopVault.security.JwtUtils;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,26 +27,6 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final VerificationService verificationService;
     private final PasswordEncoder passwordEncoder;
-
-    @Data
-    public static class EmailLoginDto {
-        private String email;
-        private String password;
-    }
-
-    @Data
-    public static class EmailRegisterDto {
-        private String email;
-        private String password;
-        private String code; // 邮箱验证码
-    }
-
-    @Data
-    public static class ResetPasswordDto {
-        private String email;
-        private String code;
-        private String newPassword;
-    }
 
     @LogOperation(module = "系统安全", action = "用户前台登录")
     @PostMapping("/login")

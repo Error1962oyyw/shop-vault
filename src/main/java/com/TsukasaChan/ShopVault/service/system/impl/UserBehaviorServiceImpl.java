@@ -14,6 +14,7 @@ public class UserBehaviorServiceImpl extends ServiceImpl<UserBehaviorMapper, Use
      * 记录用户行为并打分
      * @param type 1:点击(1分) 2:收藏(2分) 3:加购(3分) 4:购买(5分)
      */
+    @Override
     public void recordBehavior(Long userId, Long productId, Integer type) {
         if (userId == null || productId == null) return;
 

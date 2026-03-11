@@ -1,11 +1,11 @@
 package com.TsukasaChan.ShopVault.manager;
 
+import com.TsukasaChan.ShopVault.dto.DashboardStatDto;
 import com.TsukasaChan.ShopVault.entity.order.Order;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
 import com.TsukasaChan.ShopVault.service.product.ProductService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +23,6 @@ public class DashboardManager {
     private final UserService userService;
     private final ProductService productService;
     private final OrderService orderService;
-
-    @Data
-    public static class DashboardStatDto {
-        private long totalUsers;
-        private long totalProducts;
-        private long totalOrders;
-        private BigDecimal totalRevenue; // 总营收
-        private List<Map<String, Object>> recent7DaysSales; // 近7天销售额趋势
-    }
 
     public DashboardStatDto getDashboardStats() {
         DashboardStatDto stat = new DashboardStatDto();

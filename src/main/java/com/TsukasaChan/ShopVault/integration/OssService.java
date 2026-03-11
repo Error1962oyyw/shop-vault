@@ -29,11 +29,13 @@ public class OssService {
      */
     public String uploadFile(MultipartFile file) {
         try {
-            // 生成唯一的文件名，防止覆盖
+            // 获取原文件名并进行安全校验，防止 NPE
             String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String fileName = "shopvault/" + UUID.randomUUID().toString() + extension;
-
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String fileName = "shopvault/" + UUID.randomUUID() + extension;
             // 创建 OSS 客户端
             OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 

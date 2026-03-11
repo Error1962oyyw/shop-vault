@@ -3,12 +3,12 @@ package com.TsukasaChan.ShopVault.controller.order;
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.dto.ResolveDto;
 import com.TsukasaChan.ShopVault.entity.order.AfterSales;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.order.AfterSalesService;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -55,15 +55,6 @@ public class AfterSalesController {
     }
 
     // --- 以下为管理员接口 ---
-
-    @Data
-    public static class ResolveDto {
-        private String orderNo;
-        private Boolean isAgree;
-        private String merchantReply;
-        private BigDecimal refundAmount; // 如果同意退款，需指定退款金额
-    }
-
     /**
      * 3. 管理端：审核并处理售后申请
      */

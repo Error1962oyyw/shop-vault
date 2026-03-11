@@ -1,6 +1,7 @@
 package com.TsukasaChan.ShopVault.controller.system;
 
 import com.TsukasaChan.ShopVault.common.Result;
+import com.TsukasaChan.ShopVault.dto.DashboardStatDto;
 import com.TsukasaChan.ShopVault.manager.DashboardManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,7 @@ public class DashboardController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stats")
-    public Result<DashboardManager.DashboardStatDto> getStats() {
+    public Result<DashboardStatDto> getStats() {
         return Result.success(dashboardService.getDashboardStats());
     }
 }

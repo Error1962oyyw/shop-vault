@@ -5,4 +5,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface UserService extends IService<User> {
     void registerWithEmail(String email, String password);
+
+    void updateProfile(Long userId, User updateInfo);
 }

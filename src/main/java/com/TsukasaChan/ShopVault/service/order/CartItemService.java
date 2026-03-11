@@ -4,5 +4,5 @@ import com.TsukasaChan.ShopVault.entity.order.CartItem;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface CartItemService extends IService<CartItem> {
-
+    void addOrUpdateCart(CartItem cartItem, Long userId);
 }

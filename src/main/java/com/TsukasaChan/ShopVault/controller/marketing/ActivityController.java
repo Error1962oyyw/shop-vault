@@ -3,7 +3,6 @@ package com.TsukasaChan.ShopVault.controller.marketing;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
 import com.TsukasaChan.ShopVault.entity.marketing.Activity;
-import com.TsukasaChan.ShopVault.entity.marketing.UserCoupon;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.marketing.ActivityService;
 import com.TsukasaChan.ShopVault.service.marketing.UserCouponService;
@@ -60,27 +59,7 @@ public class ActivityController {
     @PostMapping("/coupons/claim/{activityId}")
     public Result<String> claimCoupon(@PathVariable Long activityId) {
         Long userId = getCurrentUserId();
-
-        Activity activity = activityService.getById(activityId);
-        if (activity == null || activity.getType() != 3 || activity.getStatus() != 1) {
-            return Result.error(400, "该优惠券不存在或已下架");
-        }
-
-        // 防刷：每个人针对同一张券只能领一次
-        long count = userCouponService.count(new LambdaQueryWrapper<UserCoupon>()
-                .eq(UserCoupon::getUserId, userId)
-                .eq(UserCoupon::getActivityId, activityId));
-        if (count > 0) {
-            return Result.error(400, "您已经领取过这张优惠券啦！");
-        }
-
-        UserCoupon userCoupon = new UserCoupon();
-        userCoupon.setUserId(userId);
-        userCoupon.setActivityId(activityId);
-        userCoupon.setStatus(0); // 0:未使用
-        userCoupon.setExpireTime(activity.getEndTime()); // 优惠券的过期时间就是活动的结束时间
-        userCouponService.save(userCoupon);
-
+        userCouponService.claimCoupon(userId, activityId);
         return Result.success("优惠券领取成功，快去下单使用吧！");
     }
 }

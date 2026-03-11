@@ -31,16 +31,7 @@ public class CartItemController {
         Long userId = getCurrentUserId();
         cartItem.setUserId(userId);
 
-        CartItem existItem = cartItemService.getOne(new LambdaQueryWrapper<CartItem>()
-                .eq(CartItem::getUserId, userId)
-                .eq(CartItem::getProductId, cartItem.getProductId()));
-
-        if (existItem != null) {
-            existItem.setQuantity(existItem.getQuantity() + cartItem.getQuantity());
-            cartItemService.updateById(existItem);
-        } else {
-            cartItemService.save(cartItem);
-        }
+        cartItemService.addOrUpdateCart(cartItem, userId);
 
         // 记录加购行为，提供给推荐算法 (3代表加入购物车)
         userBehaviorService.recordBehavior(userId, cartItem.getProductId(), 3);
