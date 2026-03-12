@@ -3,16 +3,13 @@ package com.TsukasaChan.ShopVault.controller.product;
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
-import com.TsukasaChan.ShopVault.entity.product.Product;
+import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.entity.product.Category;
-import com.TsukasaChan.ShopVault.entity.system.User;
+import com.TsukasaChan.ShopVault.entity.product.Product;
+import com.TsukasaChan.ShopVault.integration.YoloClientService;
 import com.TsukasaChan.ShopVault.service.product.CategoryService;
 import com.TsukasaChan.ShopVault.service.product.ProductService;
-import com.TsukasaChan.ShopVault.integration.YoloClientService;
-import com.TsukasaChan.ShopVault.service.system.UserBehaviorService;
-import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.TsukasaChan.ShopVault.service.system.YoloMappingService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,18 +22,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
-public class ProductController {
+public class ProductController extends BaseController {
 
     private final ProductService productService;
     private final YoloClientService yoloClientService;
     private final YoloMappingService yoloMappingService;
     private final CategoryService categoryService;
-    private final UserBehaviorService userBehaviorService;
-    private final UserService userService; // 用于获取当前用户
 
-    /**
-     * 1. 发布商品 (仅限管理员)
-     */
     @LogOperation(module = "商品管理", action = "发布新商品")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/publish")
@@ -44,90 +36,36 @@ public class ProductController {
         if (!StringUtils.hasText(product.getName()) || product.getPrice() == null) {
             return Result.error(400, "商品名称和价格不能为空");
         }
-
-        product.setStatus(1); // 默认上架状态
-        product.setSales(0);  // 初始销量0
+        product.setStatus(1);
+        product.setSales(0);
         productService.save(product);
-
         return Result.success("商品发布成功！");
     }
 
-    /**
-     * 2. 分页获取商品列表
-     */
     @GetMapping("/list")
     public Result<Page<Product>> getProductList(
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId) {
-
-        Page<Product> page = new Page<>(current, size);
-        LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
-
-        wrapper.eq(Product::getStatus, 1);
-
-        if (StringUtils.hasText(keyword)) {
-            wrapper.like(Product::getName, keyword);
-        }
-
-        if (categoryId != null) {
-            wrapper.eq(Product::getCategoryId, categoryId);
-        }
-
-        wrapper.orderByDesc(Product::getCreateTime);
-
-        Page<Product> productPage = productService.page(page, wrapper);
-        return Result.success(productPage);
+        return Result.success(productService.getProductPage(current, size, keyword, categoryId));
     }
 
-    /**
-     * 3. AI视觉检索 (粗筛+细选逻辑)
-     */
     @PostMapping("/yolo-search")
     public Result<List<Category>> yoloSearch(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return Result.error(400, "请上传图片");
-        }
-
-        // 1. 调用 Python YOLO 获取英文标签
+        if (file.isEmpty()) return Result.error(400, "请上传图片");
         List<String> labels = yoloClientService.detectImage(file);
-        if (labels.isEmpty()) {
-            return Result.error(404, "抱歉，AI没能在图中找到认识的商品哦");
-        }
+        if (labels.isEmpty()) return Result.error(404, "抱歉，AI没能在图中找到认识的商品哦");
 
-        // 2. 根据标签去查对应的系统分类 ID (比如查出 [1, 2])
         List<Long> categoryIds = yoloMappingService.findCategoryIdsByLabels(labels);
-        if (categoryIds.isEmpty()) {
-            return Result.error(404, "图片中识别出了: " + labels + "，但目前商城没有相关的商品分类");
-        }
+        if (categoryIds.isEmpty()) return Result.error(404, "图片中识别出了: " + labels + "，但目前商城没有相关的分类");
 
-        // 3. 重构点：拿着这些 ID，去分类表里查出具体的分类信息 (分类名称、图标等)
-        List<Category> categories = categoryService.listByIds(categoryIds);
-
-        // 4. 返回分类列表给前端，让用户做选择
-        return Result.success(categories);
+        return Result.success(categoryService.listByIds(categoryIds));
     }
 
-    /**
-     * 获取商品详情 (游客可看，但如果登录了就记录行为)
-     */
     @GetMapping("/detail/{id}")
     public Result<Product> getProductDetail(@PathVariable Long id) {
-        Product product = productService.getById(id);
-        if (product == null || product.getStatus() == 0) {
-            return Result.error(404, "商品不存在或已下架");
-        }
-
-        // 尝试获取当前登录用户，如果登录了就记录“点击”行为
-        String username = SecurityUtils.getCurrentUsername();
-        if (username != null && !username.equals("anonymousUser")) {
-            User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
-            if (user != null) {
-                // ★ 记录点击浏览行为 (1代表点击)
-                userBehaviorService.recordBehavior(user.getId(), id, 1);
-            }
-        }
-        return Result.success(product);
+        // 将获取当前用户名的工作交给 Controller，将查库记录行为的工作交给 Service
+        return Result.success(productService.getProductDetailWithBehavior(id, SecurityUtils.getCurrentUsername()));
     }
 }

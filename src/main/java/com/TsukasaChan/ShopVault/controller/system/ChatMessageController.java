@@ -1,11 +1,10 @@
 package com.TsukasaChan.ShopVault.controller.system;
 
 import com.TsukasaChan.ShopVault.common.Result;
-import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.entity.system.ChatMessage;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.system.ChatMessageService;
-import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,14 +15,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
-public class ChatMessageController {
+public class ChatMessageController extends BaseController {
 
     private final ChatMessageService chatMessageService;
-    private final UserService userService;
-
-    private Long getCurrentUserId() {
-        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
-    }
 
     private Long getAdminId() {
         User admin = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getRole, "ADMIN").last("LIMIT 1"));

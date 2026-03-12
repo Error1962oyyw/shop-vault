@@ -2,13 +2,10 @@ package com.TsukasaChan.ShopVault.controller.order;
 
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
-import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.dto.BuyNowDto;
 import com.TsukasaChan.ShopVault.dto.CartCheckoutDto;
-import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.order.OrderService;
-import com.TsukasaChan.ShopVault.service.system.UserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderController extends BaseController {
 
     private final OrderService orderService;
-    private final UserService userService;
-
-    private Long getCurrentUserId() {
-        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
-    }
 
     // 1. 立即购买 (详情页)
     @LogOperation(module = "订单交易", action = "直接下单购买")

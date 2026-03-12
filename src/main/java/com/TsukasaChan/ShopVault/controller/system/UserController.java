@@ -3,6 +3,7 @@ package com.TsukasaChan.ShopVault.controller.system;
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.dto.PasswordUpdateDto;
 import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.system.UserService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController extends BaseController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder; // 用于密码加密和校验
@@ -23,10 +24,6 @@ public class UserController {
     private User getCurrentUser() {
         return userService.getOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, SecurityUtils.getCurrentUsername()));
-    }
-
-    private Long getCurrentUserId() {
-        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
     }
 
     /**

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -114,5 +115,19 @@ public class AfterSalesServiceImpl extends ServiceImpl<AfterSalesMapper, AfterSa
         userService.updateById(user);
         this.updateById(afterSales);
         orderService.updateById(order);
+    }
+
+    @Override
+    public List<AfterSales> getMyAfterSalesList(Long userId) {
+        return this.list(new LambdaQueryWrapper<AfterSales>()
+                .eq(AfterSales::getUserId, userId)
+                .orderByDesc(AfterSales::getCreateTime));
+    }
+
+    @Override
+    public List<AfterSales> getAllAfterSalesList() {
+        return this.list(new LambdaQueryWrapper<AfterSales>()
+                .orderByAsc(AfterSales::getStatus)
+                .orderByDesc(AfterSales::getCreateTime));
     }
 }

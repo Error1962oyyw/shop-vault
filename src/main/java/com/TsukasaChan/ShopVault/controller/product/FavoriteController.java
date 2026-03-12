@@ -2,11 +2,9 @@ package com.TsukasaChan.ShopVault.controller.product;
 
 import com.TsukasaChan.ShopVault.annotation.LogOperation;
 import com.TsukasaChan.ShopVault.common.Result;
-import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.entity.product.Favorite;
-import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.product.FavoriteService;
-import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +14,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/favorite")
 @RequiredArgsConstructor
-public class FavoriteController {
+public class FavoriteController extends BaseController {
 
     private final FavoriteService favoriteService;
-    private final UserService userService;
-    private Long getCurrentUserId() {
-        return userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
-    }
 
     /**
      * 收藏/取消收藏 商品 (Toggle 逻辑)
