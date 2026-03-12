@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -92,5 +93,14 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         orderItemService.save(item);
 
         return orderNo;
+    }
+
+    @Override
+    public List<Activity> getAvailableCoupons() {
+        return this.list(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Activity>()
+                .eq(Activity::getType, 3)
+                .eq(Activity::getStatus, 1)
+                .le(Activity::getStartTime, java.time.LocalDateTime.now())
+                .ge(Activity::getEndTime, java.time.LocalDateTime.now()));
     }
 }

@@ -18,8 +18,9 @@ import java.time.LocalDateTime;
 @TableName("pms_product")
 public class Product implements Serializable {
 
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)

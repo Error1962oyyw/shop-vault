@@ -17,8 +17,9 @@ import lombok.Data;
 @TableName(value ="pms_favorite")
 @Data
 public class Favorite implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

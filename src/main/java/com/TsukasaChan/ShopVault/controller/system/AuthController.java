@@ -5,16 +5,13 @@ import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.dto.EmailLoginDto;
 import com.TsukasaChan.ShopVault.dto.EmailRegisterDto;
 import com.TsukasaChan.ShopVault.dto.ResetPasswordDto;
-import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.infrastructure.VerificationService;
 import com.TsukasaChan.ShopVault.security.JwtUtils;
 import com.TsukasaChan.ShopVault.service.system.UserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,7 +23,6 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final VerificationService verificationService;
-    private final PasswordEncoder passwordEncoder;
 
     @LogOperation(module = "系统安全", action = "用户前台登录")
     @PostMapping("/login")
@@ -82,15 +78,7 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public Result<String> resetPassword(@RequestBody ResetPasswordDto dto) {
-        if (!verificationService.verifyCode(dto.getEmail(), dto.getCode())) {
-            return Result.error(400, "验证码错误或已过期");
-        }
-
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, dto.getEmail()));
-        if (user == null) return Result.error(404, "该邮箱尚未注册");
-
-        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        userService.updateById(user);
+        userService.resetPassword(dto.getEmail(), dto.getCode(), dto.getNewPassword());
         return Result.success("密码重置成功，请重新登录");
     }
 }

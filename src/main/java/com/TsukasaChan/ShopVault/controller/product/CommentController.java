@@ -4,7 +4,6 @@ import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.entity.product.Comment;
 import com.TsukasaChan.ShopVault.service.product.CommentService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +28,7 @@ public class CommentController extends BaseController {
      */
     @GetMapping("/list/{productId}")
     public Result<List<Comment>> getComments(@PathVariable Long productId) {
-        List<Comment> list = commentService.list(new LambdaQueryWrapper<Comment>()
-                .eq(Comment::getProductId, productId)
-                .eq(Comment::getAuditStatus, 1) // 只查正常的
-                .orderByDesc(Comment::getLikes)
-                .orderByDesc(Comment::getCreateTime));
-        return Result.success(list);
+        return Result.success(commentService.getCommentsByProductId(productId));
     }
 
     /**

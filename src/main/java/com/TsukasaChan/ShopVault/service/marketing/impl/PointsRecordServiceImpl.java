@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.TsukasaChan.ShopVault.entity.marketing.PointsRecord;
 import com.TsukasaChan.ShopVault.service.marketing.PointsRecordService;
 import com.TsukasaChan.ShopVault.mapper.marketing.PointsRecordMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +16,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, PointsRecord> implements PointsRecordService {
-    StringRedisTemplate redisTemplate;
-    UserService userService;
+
+    private final StringRedisTemplate redisTemplate;
+    private final UserService userService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override

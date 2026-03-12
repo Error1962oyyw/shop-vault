@@ -18,8 +18,9 @@ import lombok.Data;
 @TableName(value ="pms_comment")
 @Data
 public class Comment implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

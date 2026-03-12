@@ -16,8 +16,9 @@ import java.math.BigDecimal;
 @Data
 @TableName("oms_order_item")
 public class OrderItem implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)

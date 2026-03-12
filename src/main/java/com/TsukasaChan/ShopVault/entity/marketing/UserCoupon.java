@@ -17,8 +17,9 @@ import lombok.Data;
 @TableName(value ="sms_user_coupon")
 @Data
 public class UserCoupon implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

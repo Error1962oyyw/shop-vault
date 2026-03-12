@@ -19,8 +19,8 @@ import lombok.Data;
 @Data
 public class Activity implements Serializable {
 
-    @Serial
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

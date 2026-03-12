@@ -17,8 +17,9 @@ import java.math.BigDecimal;
 @Data
 @TableName("sys_yolo_mapping")
 public class YoloMapping implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)

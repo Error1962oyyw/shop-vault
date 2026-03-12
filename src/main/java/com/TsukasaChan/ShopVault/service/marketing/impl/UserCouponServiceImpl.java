@@ -7,11 +7,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.TsukasaChan.ShopVault.entity.marketing.UserCoupon;
 import com.TsukasaChan.ShopVault.service.marketing.UserCouponService;
 import com.TsukasaChan.ShopVault.mapper.marketing.UserCouponMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCoupon> implements UserCouponService {
-    ActivityService  activityService;
+
+    private final ActivityService  activityService;
 
     @Override
     public void claimCoupon(Long userId, Long activityId) {

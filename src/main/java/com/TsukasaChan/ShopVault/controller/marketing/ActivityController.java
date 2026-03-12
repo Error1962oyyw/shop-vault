@@ -1,33 +1,22 @@
 package com.TsukasaChan.ShopVault.controller.marketing;
 
 import com.TsukasaChan.ShopVault.common.Result;
-import com.TsukasaChan.ShopVault.common.SecurityUtils;
+import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.entity.marketing.Activity;
-import com.TsukasaChan.ShopVault.entity.system.User;
 import com.TsukasaChan.ShopVault.service.marketing.ActivityService;
 import com.TsukasaChan.ShopVault.service.marketing.UserCouponService;
-import com.TsukasaChan.ShopVault.service.system.UserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/activity")
 @RequiredArgsConstructor
-public class ActivityController {
+public class ActivityController extends BaseController {
 
     private final ActivityService activityService;
-    private final UserService userService;
     private final UserCouponService userCouponService; // 注入新生成的 Service
-
-    // 获取当前登录用户ID
-    private Long getCurrentUserId() {
-        return userService.getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, SecurityUtils.getCurrentUsername())).getId();
-    }
 
     /**
      * 积分商城：兑换商品 (零元购)
@@ -44,13 +33,7 @@ public class ActivityController {
      */
     @GetMapping("/coupons/available")
     public Result<List<Activity>> getAvailableCoupons() {
-        // 假设 type=3 代表是优惠券发放活动
-        List<Activity> list = activityService.list(new LambdaQueryWrapper<Activity>()
-                .eq(Activity::getType, 3)
-                .eq(Activity::getStatus, 1)
-                .le(Activity::getStartTime, LocalDateTime.now())
-                .ge(Activity::getEndTime, LocalDateTime.now()));
-        return Result.success(list);
+        return Result.success(activityService.getAvailableCoupons());
     }
 
     /**

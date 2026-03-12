@@ -18,8 +18,9 @@ import lombok.Data;
 @TableName("sys_chat_message")
 public class ChatMessage implements Serializable {
 
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

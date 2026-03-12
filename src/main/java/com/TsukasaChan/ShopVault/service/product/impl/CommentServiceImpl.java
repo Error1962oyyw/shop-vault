@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
@@ -71,5 +73,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             comment.setAuditStatus(2);
             this.updateById(comment);
         }
+    }
+
+    @Override
+    public List<Comment> getCommentsByProductId(Long productId) {
+        return this.list(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Comment>()
+                .eq(Comment::getProductId, productId)
+                .eq(Comment::getAuditStatus, 1)
+                .orderByDesc(Comment::getLikes)
+                .orderByDesc(Comment::getCreateTime));
     }
 }

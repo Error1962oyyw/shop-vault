@@ -5,7 +5,6 @@ import com.TsukasaChan.ShopVault.common.Result;
 import com.TsukasaChan.ShopVault.controller.BaseController;
 import com.TsukasaChan.ShopVault.entity.product.Favorite;
 import com.TsukasaChan.ShopVault.service.product.FavoriteService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,9 +32,6 @@ public class FavoriteController extends BaseController {
      */
     @GetMapping("/my-list")
     public Result<List<Favorite>> getMyFavorites() {
-        List<Favorite> list = favoriteService.list(new LambdaQueryWrapper<Favorite>()
-                .eq(Favorite::getUserId, getCurrentUserId())
-                .orderByDesc(Favorite::getCreateTime));
-        return Result.success(list);
+        return Result.success(favoriteService.getMyFavorites(getCurrentUserId()));
     }
 }

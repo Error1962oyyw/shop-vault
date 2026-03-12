@@ -6,12 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.TsukasaChan.ShopVault.entity.product.Favorite;
 import com.TsukasaChan.ShopVault.service.product.FavoriteService;
 import com.TsukasaChan.ShopVault.mapper.product.FavoriteMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> implements FavoriteService {
 
-    UserBehaviorService userBehaviorService;
+    private final UserBehaviorService userBehaviorService;
 
     @Override
     public String toggleFavorite(Long userId, Long productId) {
@@ -34,5 +38,12 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
             userBehaviorService.recordBehavior(userId, productId, 2);
         }
         return "收藏成功";
+    }
+
+    @Override
+    public List<Favorite> getMyFavorites(Long userId) {
+        return this.list(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Favorite>()
+                .eq(Favorite::getUserId, userId)
+                .orderByDesc(Favorite::getCreateTime));
     }
 }

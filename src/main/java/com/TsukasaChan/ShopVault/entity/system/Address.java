@@ -16,8 +16,9 @@ import java.time.LocalDateTime;
 @Data
 @TableName("sys_address")
 public class Address implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)

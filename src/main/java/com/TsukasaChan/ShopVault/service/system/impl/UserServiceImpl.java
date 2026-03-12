@@ -1,6 +1,7 @@
 package com.TsukasaChan.ShopVault.service.system.impl;
 
 import com.TsukasaChan.ShopVault.entity.system.User;
+import com.TsukasaChan.ShopVault.infrastructure.VerificationService;
 import com.TsukasaChan.ShopVault.mapper.system.UserMapper;
 import com.TsukasaChan.ShopVault.service.system.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final PasswordEncoder passwordEncoder;
+    private final VerificationService verificationService;
 
     // 新增基于邮箱的注册方法
     @Transactional(rollbackFor = Exception.class)
@@ -66,5 +68,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 必须像上面这样，把允许修改的值赋给从数据库查出来的 user 对象，然后再 update，
         // 这样可以防止恶意用户在请求体中构造 {"points": 99999} 来篡改积分。
         updateById(user);
+    }
+
+    @Override
+    public void updatePassword(Long userId, String oldPassword, String newPassword) {
+        User user = this.getById(userId);
+
+        // 校验旧密码是否正确
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+
+        // 加密新密码并保存
+        user.setPassword(passwordEncoder.encode(newPassword));
+        this.updateById(user);
+    }
+
+    @Override
+    public void resetPassword(String email, String code, String newPassword) {
+        if (!verificationService.verifyCode(email, code)) {
+            throw new RuntimeException("验证码错误或已过期");
+        }
+        User user = this.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
+        if (user == null) {
+            throw new RuntimeException("该邮箱尚未注册");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        this.updateById(user);
     }
 }

@@ -19,8 +19,8 @@ import lombok.Data;
 @TableName(value ="oms_after_sales")
 public class AfterSales implements Serializable {
 
-    @Serial
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

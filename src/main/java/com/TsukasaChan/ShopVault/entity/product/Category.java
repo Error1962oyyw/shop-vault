@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 商品分类表
@@ -15,9 +16,13 @@ import java.io.Serializable;
 @Data
 @TableName("pms_category")
 public class Category implements Serializable {
-    @Serial
+
     @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
+
+    @TableField(exist = false)
+    private List<Category> children;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
