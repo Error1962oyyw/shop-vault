@@ -19,7 +19,6 @@ public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCou
     @Override
     public void claimCoupon(Long userId, Long activityId) {
 
-
         Activity activity = activityService.getById(activityId);
         if (activity == null || activity.getType() != 3 || activity.getStatus() != 1) {
             throw new RuntimeException("该优惠券不存在或已下架");

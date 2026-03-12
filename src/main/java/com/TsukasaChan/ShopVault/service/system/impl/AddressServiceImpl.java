@@ -47,7 +47,6 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void setDefaultAddress(Long addressId, Long userId) {
-        // 你原本写好的代码保持不变
         LambdaUpdateWrapper<Address> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Address::getUserId, userId).set(Address::getIsDefault, false);
         this.update(updateWrapper);

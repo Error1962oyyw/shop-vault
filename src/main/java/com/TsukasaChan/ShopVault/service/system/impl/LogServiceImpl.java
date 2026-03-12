@@ -7,7 +7,6 @@ import com.TsukasaChan.ShopVault.mapper.system.LogMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
-    implements LogService{
+public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogService {
 
 }
